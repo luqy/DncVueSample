@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/DncVueSample-master.iml" filepath="$PROJECT_DIR$/.idea/DncVueSample-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/DncVueSample.iml" filepath="$PROJECT_DIR$/.idea/DncVueSample.iml" />
     </modules>
   </component>
 </project>

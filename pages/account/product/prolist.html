@@ -14,7 +14,7 @@
 
 <body>
     <div id="app">
-        <i-Button type="primary" @click="modal1 = true">Display dialog box</i-Button>
+        <i-Button type="primary" @click="modal1 = true">添加产品</i-Button>
         <Modal
                 v-model="modal1"
                 title="添加产品"
@@ -22,26 +22,26 @@
                 @on-cancel="cancel"
         >
             <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-                <Form-item label="姓名" prop="name">
-                    <i-input v-model="formValidate.pdt_name" placeholder="Username"></i-input>
+                <Form-item label="产品名称" prop="pdt_name">
+                    <i-input v-model="formValidate.pdt_name" placeholder="请输入产品名称"></i-input>
                 </Form-item>
                 <Form-item label="产品版本" prop="version">
-                    <i-input v-model="formValidate.version" placeholder="Username"></i-input>
+                    <i-input v-model="formValidate.version" placeholder="请输入产品版本号 "></i-input>
                 </Form-item>
                 <Form-item label="产品地址" prop="host">
-                    <i-input v-model="formValidate.host" placeholder="Username"></i-input>
+                    <i-input v-model="formValidate.host" placeholder="请输入产品地址"></i-input>
                 </Form-item>
                 <Form-item label="产品描述" prop="description">
-                    <i-input v-model="formValidate.pdt_name" placeholder="Username"></i-input>
+                    <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
                 </Form-item>
-                <Form-item label="文件上传" >
-                    <i-input type="file" class="file"  v-on:click="tirggerFile"/>
-<!--                    <Upload action="//jsonplaceholder.typicode.com/posts/" >
+<!--                <Form-item label="文件上传" >
+                    <i-input type="file" class="file"  @change="tirggerFile"/>
+&lt;!&ndash;                    <Upload action="//jsonplaceholder.typicode.com/posts/" >
                         <i-Button icon="ios-cloud-upload-outline">Upload files</i-Button>
-                    </Upload>-->
-                </Form-item>
-                <Form-item label="api_json" prop="host">
-                    <i-input v-model="formValidate.api_json" placeholder="Username"></i-input>
+                    </Upload>&ndash;&gt;
+                </Form-item>-->
+                <Form-item label="api_json" prop="api_json">
+                    <i-input v-model="formValidate.api_json" placeholder="请输入接口字符串"></i-input>
                 </Form-item>
             </i-form>
 
@@ -56,7 +56,7 @@
                 return {
                     modal1: false,
                     formValidate: {
-                        pdt_name: '',
+                        pdt_name: '123',
                         version: '',
                         host: '',
                         description: '',
@@ -64,20 +64,19 @@
                     },
                     ruleValidate: {
                         pdt_name: [
-                            { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+                            { required: true, message: '产品名称不能为空', trigger: 'blur' }
                         ],
                         host: [
-                            { required: true, message: 'The host cannot be empty', trigger: 'blur' }
+                            { required: true, message: '产品地址不能为空', trigger: 'blur' }
                         ],
                         version: [
-                            { required: true, message: 'The host cannot be empty', trigger: 'blur' }
+                            { required: true, message: '产品版本不能为空', trigger: 'blur' }
                         ],
                         description: [
-                            { required: true, message: 'Please enter a personal introduction', trigger: 'blur' },
-                            { type: 'string', min: 10, message: 'Introduce no less than 20 words', trigger: 'blur' }
+                            { required: true, message: '请输入产品描述', trigger: 'blur' },
                         ],
                         api_json: [
-                            { required: true, message: 'The host cannot be empty', trigger: 'blur' }
+                            { required: true, message: '产品接口字符串不能为空', trigger: 'blur' }
                         ]
                     },
                   tableData3: [
@@ -211,7 +210,7 @@
               .then(res => {
                 console.log(res)
                 this.tableData3 = res.data.message
-                this.filters=this.tableData3.pdt_name
+                //this.filters=this.tableData3.pdt_name
               })
               .catch(function (error) {
                 console.log(error)
@@ -219,60 +218,10 @@
 
           },
           methods:{
-            remove: function (index) {
-              console.log('date1' + this.tableData3[index].pdt_id)
-              // 格局id删除数据
-              var obj = {pdt_id: this.tableData3[index].pdt_id}
-              this.tableData3.splice(index, 1)
-              // var url = '/api/product/delproduct'
-              // 发送异步请求
-              this.$axios({
-                url: '/api/product/delproduct',
-                method: 'delete',
-                dataType: 'json',
-                headers: {
-                  'Content-type': 'application/json;'
-                },
-                data: JSON.stringify(obj),
-              }).then(res => {
-                if (res.status === 200) {
-                  alert('success')
-                  // 更新数据
-                  console.log(res.message)
-                  this.tableData3.splice(index, 1)
-                } else {
-                  alert(res.message)
-                }
-              }).catch(function () {
-                alert('服务连接出错了')
-              })
-            },
-            show (index) {
-              this.$Modal.info({
-                title: '编辑产品',
-                width: '900px',
-                fullscreen:true,
-                content: `
- <p>测试一下</p>`,
-                onOk: () => {
-                  this.$Message.info('点击了确定');
-                },
-                onCancel: () => {
-                  this.$Message.info('点击了取消');
-                }
-              })
-            },
-            ok () {
-              this.$Message.info('点击了确定');
-              console.log("123:"+JSON.stringify(this.formValidate));
-
-            },
-            cancel () {
-              this.$Message.info('Clicked cancel');
-            },
+                //文件上传按钮
               tirggerFile: function (event) {
                   // 此处校验文件后缀
-                  var self = this
+                  var self = this.formValidate
                   var file = event.target.files[0]
                       .name // (利用console.log输出看file文件对象) properties/xml/json/conf/config/data/ini/txt/yaml/yml/cfg
                   var num = file.split('.')
@@ -299,9 +248,102 @@
                           self.formValidate.api_json = api_json
                       }
                   }
-              }
-          }
+              },
+              //删除按钮
+              remove: function (index) {
+                  console.log('date1' + this.tableData3[index].pdt_id)
+                  // 格局id删除数据
+                  var obj = {pdt_id: this.tableData3[index].pdt_id}
+                  this.tableData3.splice(index, 1)
+                  // var url = '/api/product/delproduct'
+                  // 发送异步请求
+                  axios({
+                      url: ''+host+'/api/product/delproduct',
+                      method: 'delete',
+                      dataType: 'json',
+                      headers: {
+                          'Content-type': 'application/json;'
+                      },
+                      data: JSON.stringify(obj),
+                  }).then(res => {
+                      if (res.status === 200) {
+                          alert('success')
+                          // 更新数据
+                          console.log(res.message)
+                          this.tableData3.splice(index, 1)
+                      } else {
+                          alert(res.message)
+                      }
+                  }).catch(function () {
+                      alert('服务连接出错了')
+                  })
+              },
+              //点击编辑
+              show (index) {
+                  this.$Modal.confirm({
+                      title: '编辑产品',
+                      fullscreen:true,
+                      title: '编辑产品',
+                      content: `
+                              产品名称：<input size="35" value="${this.tableData3[index].pdt_name}"/><br>
+                             <br>产品版本：<input  size="35"value="${this.tableData3[index].version}"/><br>
+                             <br>产品地址：<input size="35" value="${this.tableData3[index].host}"/><br>
+                             <br>产品描述：<input size="35" value="${this.tableData3[index].description}"/><br>
+                             <br>api_json ：<input  size="35" value=${JSON.stringify(this.tableData3[index].api_json)}/>`,
+                      onOk: () => {
+                          this.$Message.info('点击了确定');
+                          console.log("修改数据:"+JSON.stringify(this.tableData3[index].description));
+                          axios({
+                              url: ''+host+'/api/product/updateproduct',
+                              "method": "PUT",
+                              dataType: 'json',
+                              headers: {
+                                  'Content-type': 'application/json;'
+                              },
+                              data: JSON.stringify(this.tableData3[index]),
+                          }).then(function (response){
+                              console.log("修改产品："+JSON.stringify(response))
+                              alert("操作:"+response.data.title+",\n结果:"+response.data.message)
+                              location.reload()
 
+                          })
+                              .catch(function(error){
+                                  console.log(error)
+                              })
+
+                      },
+                      onCancel: () => {
+                          this.$Message.info('点击了取消');
+                      }
+                  })
+              },
+              //弹窗点击确定
+              ok () {
+                  console.log("123:"+JSON.stringify(this.formValidate));
+                  axios({
+                      url: ''+host+'/api/product/addproducts',
+                      method: 'post',
+                      dataType: 'json',
+                      headers: {
+                          'Content-type': 'application/json;'
+                      },
+                      data: JSON.stringify(this.formValidate),
+                  }).then(function (response){
+                      console.log(response)
+                      alert("操作:"+response.data.title+",\n结果:"+response.data.message)
+                      location.reload()
+
+                  })
+                      .catch(function(error){
+                          console.log(error)
+                      })
+
+              },
+              cancel () {
+                  this.$Message.info('已取消');
+              },
+
+          }
         });
     </script>
 </body>
