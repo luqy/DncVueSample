@@ -7,6 +7,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/pages/account/product/addpro.html" beforeDir="false" afterPath="$PROJECT_DIR$/pages/account/product/addpro.html" afterDir="false" />
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
 =======
       <change beforePath="$PROJECT_DIR$/pages/account/product/addpro.html" beforeDir="false" afterPath="$PROJECT_DIR$/pages/account/product/addpro.html" afterDir="false" />
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
@@ -26,6 +30,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pages/account/product/prolist.html">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
 <<<<<<< HEAD
             <state relative-caret-position="-4">
               <caret line="392" column="20" lean-forward="true" selection-start-line="392" selection-start-column="20" selection-end-line="392" selection-end-column="20" />
@@ -66,6 +71,21 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+=======
+            <state relative-caret-position="219">
+              <caret line="287" column="30" selection-start-line="287" selection-start-column="30" selection-end-line="287" selection-end-column="30" />
+              <folding>
+                <element signature="e#4539#7924#0" />
+                <element signature="e#6429#6629#0" />
+                <element signature="e#8384#9920#0" />
+                <element signature="e#11698#11765#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         <entry file="file://$PROJECT_DIR$/LICENSE">
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
@@ -75,12 +95,16 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="204">
               <caret line="211" column="31" lean-forward="true" selection-start-line="211" selection-start-column="31" selection-end-line="211" selection-end-column="31" />
+<<<<<<< HEAD
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/pages/account/product/addpro.html">
           <provider selected="true" editor-type-id="text-editor">
@@ -90,10 +114,15 @@
                 <element signature="n#style#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
 =======
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-938">
               <caret line="110" column="21" lean-forward="true" selection-start-line="110" selection-start-column="21" selection-end-line="110" selection-end-column="21" />
+<<<<<<< HEAD
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
             </state>
           </provider>
@@ -101,11 +130,14 @@
       </file>
       <file pinned="false" current-in-tab="false">
 <<<<<<< HEAD
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/pages/account/task/tasklist.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="308">
               <caret line="14" column="6" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
 =======
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
@@ -113,11 +145,15 @@
                 <caret line="18" selection-start-line="18" selection-end-line="18" />
               </first_editor>
               <second_editor />
+<<<<<<< HEAD
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
 <<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pages/account/report/reportlist.html">
@@ -133,6 +169,8 @@
           </provider>
         </entry>
       </file>
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
 =======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
     </leaf>
@@ -167,8 +205,11 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/pages/account/product/addpro.html" />
 <<<<<<< HEAD
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/pages/account/api/apilist.html" />
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
 =======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         <option value="$PROJECT_DIR$/pages/account/product/prolist.html" />
@@ -176,17 +217,23 @@
     </option>
   </component>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <component name="ProjectFrameBounds">
     <option name="x" value="259" />
     <option name="y" value="46" />
     <option name="width" value="1365" />
     <option name="height" value="797" />
 =======
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
   <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="318" />
     <option name="y" value="106" />
     <option name="width" value="1365" />
     <option name="height" value="775" />
+<<<<<<< HEAD
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -226,6 +273,7 @@
               <item name="pages" type="462c0819:PsiDirectoryNode" />
               <item name="account" type="462c0819:PsiDirectoryNode" />
               <item name="product" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
             </path>
 <<<<<<< HEAD
             <path>
@@ -256,6 +304,9 @@
               <item name="settings" type="462c0819:PsiDirectoryNode" />
             </path>
 =======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
+            </path>
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
           </expand>
           <select />
@@ -327,6 +378,7 @@
       <workItem from="1564471899992" duration="227000" />
       <workItem from="1564473852663" duration="10207000" />
 <<<<<<< HEAD
+<<<<<<< HEAD
       <workItem from="1564484275455" duration="7000" />
       <workItem from="1564535186512" duration="598000" />
       <workItem from="1564540619328" duration="7277000" />
@@ -337,12 +389,18 @@
       <workItem from="1564655859407" duration="4779000" />
 =======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="80763000" />
+=======
+    <option name="totallyTimeSpent" value="65137000" />
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
 =======
     <option name="totallyTimeSpent" value="65137000" />
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
@@ -358,10 +416,16 @@
   </component>
   <component name="ToolWindowManager">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.122068234" />
+=======
+    <frame x="318" y="106" width="1365" height="775" extended-state="1" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22452107" />
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
 =======
     <frame x="318" y="106" width="1365" height="775" extended-state="1" />
     <layout>
@@ -522,8 +586,11 @@
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/pages/account/api/index.html" />
 =======
+=======
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
     <entry file="file://$PROJECT_DIR$/pages/basic/settings/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="70">
@@ -546,6 +613,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
 <<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/pages/account/other/list.html">
       <provider selected="true" editor-type-id="text-editor" />
@@ -621,11 +689,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="418">
           <caret line="19" column="28" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+=======
+    <entry file="file://$PROJECT_DIR$/login.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="211" column="31" lean-forward="true" selection-start-line="211" selection-start-column="31" selection-end-line="211" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="22" selection-start-column="22" selection-end-column="22" />
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="-594">
           <caret line="21" column="56" selection-start-line="21" selection-start-column="56" selection-end-line="21" selection-end-column="56" />
         </state>
@@ -637,6 +719,15 @@
           <caret line="392" column="20" lean-forward="true" selection-start-line="392" selection-start-column="20" selection-end-line="392" selection-end-column="20" />
 =======
       <provider selected="true" editor-type-id="text-editor">
+=======
+        <state relative-caret-position="-938">
+          <caret line="110" column="21" lean-forward="true" selection-start-line="110" selection-start-column="21" selection-end-line="110" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/account/product/addpro.html">
+      <provider selected="true" editor-type-id="text-editor">
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         <state relative-caret-position="2111">
           <caret line="128" column="23" lean-forward="true" selection-start-line="128" selection-start-column="23" selection-end-line="128" selection-end-column="23" />
           <folding>
@@ -655,6 +746,9 @@
             <element signature="e#8384#9920#0" />
             <element signature="e#11698#11765#0" />
           </folding>
+<<<<<<< HEAD
+>>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
+=======
 >>>>>>> 79728d36ddd2d89662dcb820b0d27738b9dfe52b
         </state>
       </provider>
