@@ -48,58 +48,12 @@
         </Modal>
       <i-Table :border="showBorder" :stripe="showStripe" :show-header="showHeader"
              :height="fixedHeader ? 250 : ''" :size="tableSize" :data="tableData3" :columns="tableColumns3"></i-Table>
-
-        <Modal
-                v-model="editFormVisible"
-                title="编辑产品"
-                @on-cancel="cancel"
-        >
-            <i-form ref="editForm" :model="editForm" :rules="ruleValidate" :label-width="80">
-                <Form-item label="产品名称" prop="pdt_name">
-                    <i-input v-model="editForm.pdt_name" placeholder="请输入产品名称"></i-input>
-                </Form-item>
-                <Form-item label="产品版本" prop="version">
-                    <i-input v-model="editForm.version" placeholder="请输入产品版本号 "></i-input>
-                </Form-item>
-                <Form-item label="产品地址" prop="host">
-                    <i-input v-model="editForm.host" placeholder="请输入产品地址"></i-input>
-                </Form-item>
-                <Form-item label="产品描述" prop="description">
-                    <i-input v-model="editForm.description" placeholder="请输入产品描述"></i-input>
-                </Form-item>
-                <!--                <Form-item label="文件上传" >
-                                    <i-input type="file" class="file"  @change="tirggerFile"/>
-                &lt;!&ndash;                    <Upload action="//jsonplaceholder.typicode.com/posts/" >
-                                        <i-Button icon="ios-cloud-upload-outline">Upload files</i-Button>
-                                    </Upload>&ndash;&gt;
-                                </Form-item>-->
-                <Form-item label="api_json" prop="api_json">
-                    <i-input v-model="editForm.api_json" placeholder="请输入接口字符串"></i-input>
-                </Form-item>
-            </i-form>
-
-        </Modal>
-
     </div>
     <script type="text/javascript">
         var vm = new Vue({
             el: "#app",
             data: function () {
                 return {
-                    editFormVisible:false,
-                    editFormRules: {
-                        name: [
-                            { required: true, message: '请输入姓名', trigger: 'blur' }
-                        ]
-                    },
-                    editForm: {
-                        pdt_id:'' ,
-                        pdt_name: '',
-                        version: '',
-                        host: '',
-                        description: '',
-
-                    },
                     modal1: false,
                     formValidate: {
                         pdt_name: '123',
@@ -326,24 +280,19 @@
               },
               //点击编辑
               show (index) {
-                  this.editFormVisible=true;
-                  console.log("shouw"+JSON.stringify(this.tableData3[index]))
-                  this.editForm=this.tableData3[index];
-                  console.log("shouw1"+JSON.stringify(this.editForm))
-/*                  this.$Modal.confirm({
+                  this.$Modal.confirm({
                       title: '编辑产品',
                       fullscreen:true,
                       title: '编辑产品',
                       content: `
-                              产品名称：<input size="35"v-bind:value="${this.tableData3[index].pdt_name}"
-  v-on:input="${this.tableData3[index].pdt_name} = $event.target.value" /><br>
+                              产品名称：<input size="35" prop="${this.tableData3[index].pdt_name}"/><br>
                              <br>产品版本：<input  size="35"value="${this.tableData3[index].version}"/><br>
                              <br>产品地址：<input size="35" value="${this.tableData3[index].host}"/><br>
                              <br>产品描述：<input size="35" value="${this.tableData3[index].description}"/><br>
                              <br>api_json ：<input  size="35" value=${JSON.stringify(this.tableData3[index].api_json)}/>`,
                       onOk: () => {
                           this.$Message.info('点击了确定');
-                          console.log("修改数据:"+JSON.stringify(this.tableData3[index]));
+                          console.log("修改数据:"+JSON.stringify(this.tableData3[index].description));
                           axios({
                               url: ''+host+'/api/product/updateproduct',
                               "method": "PUT",
@@ -366,7 +315,7 @@
                       onCancel: () => {
                           this.$Message.info('点击了取消');
                       }
-                  })*/
+                  })
               },
               //弹窗点击确定
               ok () {
@@ -390,32 +339,8 @@
                       })
 
               },
-              //编辑
-              update() {
-                  console.log("修改:"+JSON.stringify(this.editForm));
-                  axios({
-                      url: ''+host+'/api/product/updateproduct',
-                      method: 'put',
-                      dataType: 'json',
-                      headers: {
-                          'Content-type': 'application/json;'
-                      },
-                      data: JSON.stringify(this.editForm),
-                  }).then(function (response){
-                      console.log(response)
-                      alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                      location.reload()
-
-                  })
-                      .catch(function(error){
-                          console.log(error)
-                      })
-
-              },
               cancel () {
                   this.$Message.info('已取消');
-                  this.formValidate = [];
-                  //location.reload()
               },
 
           }
