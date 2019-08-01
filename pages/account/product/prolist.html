@@ -52,6 +52,7 @@
         <Modal
                 v-model="editFormVisible"
                 title="编辑产品"
+                @on-ok="update"
                 @on-cancel="cancel"
         >
             <i-form ref="editForm" :model="editForm" :rules="ruleValidate" :label-width="80">
@@ -415,6 +416,7 @@
               cancel () {
                   this.$Message.info('已取消');
                   this.formValidate = [];
+                  this.editForm=[];
                   //location.reload()
               },
 
