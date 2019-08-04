@@ -369,8 +369,10 @@
                       }
                   })*/
               },
-              //弹窗点击确定
+              //添加弹窗点击确定
               ok () {
+                  let api_json = JSON.parse(this.formValidate.api_json )
+                  this.formValidate.api_json=api_json
                   console.log("123:"+JSON.stringify(this.formValidate));
                   axios({
                       url: ''+host+'/api/product/addproducts',
@@ -387,6 +389,7 @@
 
                   })
                       .catch(function(error){
+                          alert("请求超时")
                           console.log(error)
                       })
 
@@ -415,8 +418,13 @@
               },
               cancel () {
                   this.$Message.info('已取消');
-                  this.formValidate = [];
-                  this.editForm=[];
+                  this.formValidate = {
+                      pdt_name: '123',
+                      version: '',
+                      host: '',
+                      description: '',
+                      api_json: ''
+                  };
                   //location.reload()
               },
 

@@ -4,7 +4,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>系统设置</title>
+    <title>API管理</title>
     <link rel="stylesheet" type="text/css" href="../../../assets/iview/iview-3.1.0/styles/iview.css" />
     <script src="../../../assets/vue/vue-2.5.17.min.js"></script>
     <script src="../../../assets/iview/iview-3.1.0/iview.min.js"></script>
@@ -17,13 +17,16 @@
     <i-Button type="primary" @click="modal1 = true">添加API</i-Button>
     <Modal
             v-model="modal1"
-            title="添加APi"
+            title="添加API"
             @on-ok="ok"
             @on-cancel="cancel"
     >
+
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-            <Form-item label="所属产品" prop="pdt_name">
-                <i-input v-model="formValidate.pdt_name" placeholder="请输入产品名称"></i-input>
+            <Form-item label="所属产品" >
+                <Select v-model="api_pdtname" size="large" style="width:100px">
+                    <Option v-for="item in api_pdt" :value="item.value">{{ item.pdt_name }}</Option>
+                </Select>
             </Form-item>
             <Form-item label="模块名称" prop="version">
                 <i-input v-model="formValidate.version" placeholder="请输入产品版本号 "></i-input>
@@ -32,7 +35,11 @@
                 <i-input v-model="formValidate.host" placeholder="请输入产品地址"></i-input>
             </Form-item>
             <Form-item label="HTTP请求方式" prop="description">
-                <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
+                <select  v-model="formValidate.method" style="width:200px" >
+                    <option value="post">POST</option>
+                    <option value="get">GET</option>
+                    <option value="put">PUT</option>
+                </select>
             </Form-item>
             <Form-item label="URL" prop="description">
                 <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
@@ -40,8 +47,11 @@
             <Form-item label="Header" prop="description">
                 <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
             </Form-item>
-            <Form-item label="Token" prop="description">
-                <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
+            <Form-item label="Token" >
+                <i-switch v-model="formValidate.has_token" size="large">
+                    <span slot="open">On</span>
+                    <span slot="close">Off</span>
+                </i-switch>
             </Form-item>
             <Form-item label="Body" prop="api_json">
                 <i-input v-model="formValidate.api_json" placeholder="请输入接口字符串"></i-input>
@@ -58,12 +68,22 @@
         data: function () {
             return {
                 modal1: false,
+                api_pdt:[{
+                    pdt_name: 'a',
+                    model: 'b',
+                    api_url: 'c',
+                },],
                 formValidate: {
-                    pdt_name: '123',
-                    version: '',
-                    host: '',
-                    description: '',
-                    api_json: ''
+                    api_name: '123',
+                    method: '',
+                    header: '',
+                    values: '',
+                    pdt_id: '',
+                    body: '',
+                    url: '',
+                    has_token:false,
+                    proto_message:'',
+                    proto_file:'',
                 },
                 ruleValidate: {
                     pdt_name: [
@@ -83,7 +103,6 @@
                     ]
                 },
                 apitable: [],
-                api_pdt:[],
                 showBorder: false, // 显示边框
                 showStripe: true, // 是否显示斑马纹
                 showHeader: true, // 是否显示头部信息
@@ -94,7 +113,12 @@
 
             }
         },
+        created(){
+            //如果没有这句代码，select中初始化会是空白的，默认选中就无法实现
+            this.api_pdtname = this.api_pdt[0].pdt_name;
+        },
         computed: {
+
             apiColumns() {
                 let columns = [];
                 if (this.showCheckbox) {
@@ -136,7 +160,7 @@
                     filters_name1.push(filters_name0);
                 }
                 console.log("file:"+JSON.stringify(filters_name1));
-
+                console.log("pdtName:"+JSON.stringify(this.pdtdesc))
                 columns.push({
                     title: '产品名称',
                     key: 'pdt_id',
