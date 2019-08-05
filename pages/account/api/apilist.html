@@ -24,9 +24,9 @@
 
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
             <Form-item label="所属产品" >
-                <Select v-model="api_pdtname" size="large" style="width:100px">
-                    <Option v-for="item in api_pdt" :value="item.value">{{ item.pdt_name }}</Option>
-                </Select>
+                <i-Select v-model="api_pdt" size="large" style="width:100px">
+                    <i-Option v-for="item in api_pdt" :value="item.value">{{ item.pdt_name }}</i-Option>
+                </i-Select>
             </Form-item>
             <Form-item label="模块名称" prop="version">
                 <i-input v-model="formValidate.version" placeholder="请输入产品版本号 "></i-input>
@@ -35,11 +35,11 @@
                 <i-input v-model="formValidate.host" placeholder="请输入产品地址"></i-input>
             </Form-item>
             <Form-item label="HTTP请求方式" prop="description">
-                <select  v-model="formValidate.method" style="width:200px" >
-                    <option value="post">POST</option>
-                    <option value="get">GET</option>
-                    <option value="put">PUT</option>
-                </select>
+                <i-select  v-model="formValidate.method" style="width:200px" >
+                    <i-Option  value="post">POST</i-option>
+                    <i-Option value="get">GET</i-Option>
+                    <i-Option  value="put">PUT</i-option>
+                </i-select>
             </Form-item>
             <Form-item label="URL" prop="description">
                 <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
@@ -103,6 +103,7 @@
                     ]
                 },
                 apitable: [],
+                hash:[],
                 showBorder: false, // 显示边框
                 showStripe: true, // 是否显示斑马纹
                 showHeader: true, // 是否显示头部信息
@@ -113,10 +114,10 @@
 
             }
         },
-        created(){
+/*        created(){
             //如果没有这句代码，select中初始化会是空白的，默认选中就无法实现
             this.api_pdtname = this.api_pdt[0].pdt_name;
-        },
+        },*/
         computed: {
 
             apiColumns() {
@@ -144,7 +145,7 @@
                     title: 'method',
                     key: 'method'
                 });
-                console.log("length1:"+this.api_pdt.length)
+                //console.log("length1:"+this.api_pdt.length)
                 var filters_name1=[];
                 for(var i = 0; i <this.api_pdt.length; i++){
                     var filters_name0={
@@ -207,7 +208,7 @@
                 return columns;
             }
         },
-        mounted:function(){
+        created:function(){
             axios.get(''+host+'/api/apiinfo/apilist')
                 .then(res => {
                     console.log(res)
@@ -223,12 +224,28 @@
                     console.log(res)
                     this.api_pdt = res.data.message
                     console.log(this.api_pdt[0].pdt_name)
+                    let apiarray=this.api_pdt[1].api_json;
+                    console.log("apiarray："+apiarray)
+                    //去重
+                    //遍历数据；双层循环，外循环表示从0到arr.length，内循环表示从i+1到arr.length
+                    // 将没重复的右边值放入新数组。（检测到有重复值时终止当前循环同时进入外层循环的下一轮判断）
+                    for (var i = 0; i <apiarray.length; i++) {
+                        for (var j = i+1; j < apiarray.length; j++) {
+                            if(apiarray[i].function===apiarray[j].function){
+                                ++i;
+                            }
+                        }
+                        this.hash.push(apiarray[i].function);
+                    }
+                    console.log("hash:"+stringify(this.hash))
 
 
                 })
                 .catch(function (error) {
                     console.log(error)
                 });
+        },
+        mounted:function(){
         },
         methods:{
             //删除按钮

@@ -99,6 +99,7 @@
                         version: '',
                         host: '',
                         description: '',
+                        api_json:'',
 
                     },
                     modal1: false,
@@ -330,6 +331,7 @@
                   this.editFormVisible=true;
                   console.log("shouw"+JSON.stringify(this.tableData3[index]))
                   this.editForm=this.tableData3[index];
+                  //this.editForm.api_json=JSON.parse(this.editForm.api_json)
                   console.log("shouw1"+JSON.stringify(this.editForm))
 /*                  this.$Modal.confirm({
                       title: '编辑产品',
@@ -397,6 +399,7 @@
               //编辑
               update() {
                   console.log("修改:"+JSON.stringify(this.editForm));
+                  this.editForm.api_json=JSON.parse(this.editForm.api_json)
                   axios({
                       url: ''+host+'/api/product/updateproduct',
                       method: 'put',
