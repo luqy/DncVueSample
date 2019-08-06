@@ -24,9 +24,10 @@
 
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
             <Form-item label="所属产品" >
-                <i-Select v-model="api_pdt" size="large" style="width:100px">
-                    <i-Option v-for="item in api_pdt" :value="item.value">{{ item.pdt_name }}</i-Option>
+                <i-Select v-model="api_pdt" size="large" style="width:100px" >
+                    <i-Option v-for="(item,index) in formValidate ":key="index" :value="index">{{ item.pdt_name }}</i-Option>
                 </i-Select>
+
             </Form-item>
             <Form-item label="模块名称" prop="version">
                 <i-input v-model="formValidate.version" placeholder="请输入产品版本号 "></i-input>
@@ -61,20 +62,19 @@
     </Modal>
     <i-table :border="showBorder" :stripe="showStripe" :show-header="showHeader" :height="fixedHeader ? 300 : ''"
              :size="tableSize" :data="apitable" :columns="apiColumns"></i-table>
+
 </div>
 <script type="text/javascript">
     var vm = new Vue({
         el: "#app",
         data: function () {
             return {
+
                 modal1: false,
-                api_pdt:[{
-                    pdt_name: 'a',
-                    model: 'b',
-                    api_url: 'c',
-                },],
+                api_pdt:'',
+                api_function:'',
                 formValidate: {
-                    api_name: '123',
+                    api_name: '',
                     method: '',
                     header: '',
                     values: '',
@@ -104,6 +104,7 @@
                 },
                 apitable: [],
                 hash:[],
+                pro:'',
                 showBorder: false, // 显示边框
                 showStripe: true, // 是否显示斑马纹
                 showHeader: true, // 是否显示头部信息
@@ -146,7 +147,7 @@
                     key: 'method'
                 });
                 //console.log("length1:"+this.api_pdt.length)
-                var filters_name1=[];
+              /*  var filters_name1=[];
                 for(var i = 0; i <this.api_pdt.length; i++){
                     var filters_name0={
                         label:this.api_pdt[i].pdt_name,
@@ -161,16 +162,16 @@
                     filters_name1.push(filters_name0);
                 }
                 console.log("file:"+JSON.stringify(filters_name1));
-                console.log("pdtName:"+JSON.stringify(this.pdtdesc))
+                console.log("pdtName:"+JSON.stringify(this.pdtdesc))*/
                 columns.push({
                     title: '产品名称',
                     key: 'pdt_id',
-                    filters:filters_name1 ,
+/*                    filters:filters_name1 ,
                     filterMethod (value, row) {
                         console.log(value)
                         console.log(row.api_name)
                         return row.pdt_id.indexOf(value) > -1
-                    }
+                    }*/
                 });
                 columns.push({
                     title: 'Action',
@@ -208,6 +209,13 @@
                 return columns;
             }
         },
+        watch:{
+            api_pdt(val,odlval){
+
+                 this.api_function=this.formValidate[val].api_json;
+                console.log("function"+this.api_function)
+            }
+        },
         created:function(){
             axios.get(''+host+'/api/apiinfo/apilist')
                 .then(res => {
@@ -222,10 +230,10 @@
             axios.get(''+host+'/api/product/getproductlist')
                 .then(res => {
                     console.log(res)
-                    this.api_pdt = res.data.message
-                    console.log(this.api_pdt[0].pdt_name)
-                    let apiarray=this.api_pdt[1].api_json;
-                    console.log("apiarray："+apiarray)
+                    this.formValidate = res.data.message
+                    console.log(this.formValidate [0].pdt_name)
+                    let apiarray=this.formValidate [1].api_json;
+                    //console.log("apiarray："+apiarray)
                     //去重
                     //遍历数据；双层循环，外循环表示从0到arr.length，内循环表示从i+1到arr.length
                     // 将没重复的右边值放入新数组。（检测到有重复值时终止当前循环同时进入外层循环的下一轮判断）
