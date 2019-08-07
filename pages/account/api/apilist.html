@@ -25,37 +25,50 @@
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
             <Form-item label="所属产品" >
                 <i-Select v-model="api_pdt" size="large" style="width:100px" >
-                    <i-Option v-for="(item,index) in formValidate ":key="index" :value="index">{{ item.pdt_name }}</i-Option>
+                    <i-Option v-for="(item,index) in formValidate ":key="item.pdt_id" :value="index">{{ item.pdt_name }}</i-Option>
                 </i-Select>
 
             </Form-item>
             <Form-item label="模块名称" prop="version">
-                <i-input v-model="formValidate.version" placeholder="请输入产品版本号 "></i-input>
+                <i-Select v-model="api_hashfunction" size="large" style="width:100px" >
+                    <i-Option v-for="(item,index) in hash ":key="item" :value="item">{{ item }}</i-Option>
+                </i-Select>
             </Form-item>
-            <Form-item label="API名称" prop="host">
-                <i-input v-model="formValidate.host" placeholder="请输入产品地址"></i-input>
+            <Form-item label="API参数名" prop="host">
+                <i-Select v-model="api_summary" size="large" style="width:100px" >
+                    <i-Option v-for="(item,index) in api_summary1 ":key="index" :value="index">{{ item.summary }}</i-Option>
+                </i-Select>
+            </Form-item>
+            <Form-item label="API名称" prop="description">
+                <i-input v-model="api_api.summary" placeholder="请输入产品描述"></i-input>
             </Form-item>
             <Form-item label="HTTP请求方式" prop="description">
-                <i-select  v-model="formValidate.method" style="width:200px" >
+                <i-select  v-model="api_api.method" style="width:200px" >
                     <i-Option  value="post">POST</i-option>
                     <i-Option value="get">GET</i-Option>
                     <i-Option  value="put">PUT</i-option>
                 </i-select>
             </Form-item>
             <Form-item label="URL" prop="description">
-                <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
+                <i-input v-model="api_api.uri " placeholder="请输入产品描述"></i-input>
             </Form-item>
             <Form-item label="Header" prop="description">
-                <i-input v-model="formValidate.description" placeholder="请输入产品描述"></i-input>
+                <i-input  v-model="api_api.produces" placeholder="请输入产品描述"></i-input>
             </Form-item>
             <Form-item label="Token" >
-                <i-switch v-model="formValidate.has_token" size="large">
+                <i-switch  v-model="api_api.has_token"  size="large">
                     <span slot="open">On</span>
                     <span slot="close">Off</span>
                 </i-switch>
             </Form-item>
+            <Form-item label="proto_file" prop="description" >
+                <i-input  v-model="api_api.input_proto" placeholder="请输入产品描述"></i-input>
+            </Form-item>
+            <Form-item label="proto_msg" prop="description" >
+                <i-input  v-model="api_api.message" placeholder="请输入产品描述"></i-input>
+            </Form-item>
             <Form-item label="Body" prop="api_json">
-                <i-input v-model="formValidate.api_json" placeholder="请输入接口字符串"></i-input>
+                <i-input v-model="api_api.parameters" placeholder="请输入接口字符串"></i-input>
             </Form-item>
         </i-form>
 
@@ -69,22 +82,16 @@
         el: "#app",
         data: function () {
             return {
-
                 modal1: false,
                 api_pdt:'',
+                api_hashfunction:'',
                 api_function:'',
-                formValidate: {
-                    api_name: '',
-                    method: '',
-                    header: '',
-                    values: '',
-                    pdt_id: '',
-                    body: '',
-                    url: '',
-                    has_token:false,
-                    proto_message:'',
-                    proto_file:'',
-                },
+                api_summary:'',
+                api_summary1:'',//数据结构
+                api_api:{
+                    has_token: false,
+                },//api相关数据
+                formValidate: {},//数据存储
                 ruleValidate: {
                     pdt_name: [
                         { required: true, message: '产品名称不能为空', trigger: 'blur' }
@@ -210,11 +217,44 @@
             }
         },
         watch:{
-            api_pdt(val,odlval){
-
+            //选择所属产品
+            api_pdt(val,oldval){
+                this.hash=[],
                  this.api_function=this.formValidate[val].api_json;
-                console.log("function"+this.api_function)
+               // console.log("function"+JSON.stringify(this.api_function))
+                for (var i = 0; i <this.api_function.length; i++) {
+                    for (var j = i+1; j < this.api_function.length; j++) {
+                        if(this.api_function[i].function===this.api_function[j].function){
+                            ++i;
+                        }
+                    }
+                    this.hash.push(this.api_function[i].function);
+                }
+               // console.log("push+function:"+this.hash)
+            },
+            //选择模块名称
+            api_hashfunction(val,oldval) {
+                console.log("hashfunctionn:" + val)
+               this.api_summary1=[];
+               // console.log("hashfunctionn:" + JSON.stringify(this.api_function))
+                for (i = 0; i < this.api_function.length; i++) {
+                    //console.log("i："+apiarray.length)
+                    if (this.api_function[i].function === val) {
+                      this.api_summary1.push(this.api_function[i])
+                    }
+                    //console.log("push+function+summary:"+JSON.stringify(this.api_summary1))
+                }
+            },
+            //选择API
+            api_summary(){
+                this.api_api=this.api_summary1[this.api_summary]
+                //console.log("push+function+summary22:"+JSON.stringify(this.api_api.produces))
+                this.api_api.produces=JSON.stringify(this.api_api.produces)
+                this.api_api.parameters=JSON.stringify(this.api_api.parameters)
+                this.api_api.has_token=false
+
             }
+
         },
         created:function(){
             axios.get(''+host+'/api/apiinfo/apilist')
@@ -232,21 +272,6 @@
                     console.log(res)
                     this.formValidate = res.data.message
                     console.log(this.formValidate [0].pdt_name)
-                    let apiarray=this.formValidate [1].api_json;
-                    //console.log("apiarray："+apiarray)
-                    //去重
-                    //遍历数据；双层循环，外循环表示从0到arr.length，内循环表示从i+1到arr.length
-                    // 将没重复的右边值放入新数组。（检测到有重复值时终止当前循环同时进入外层循环的下一轮判断）
-                    for (var i = 0; i <apiarray.length; i++) {
-                        for (var j = i+1; j < apiarray.length; j++) {
-                            if(apiarray[i].function===apiarray[j].function){
-                                ++i;
-                            }
-                        }
-                        this.hash.push(apiarray[i].function);
-                    }
-                    console.log("hash:"+stringify(this.hash))
-
 
                 })
                 .catch(function (error) {
@@ -258,14 +283,14 @@
         methods:{
             //删除按钮
             remove: function (index) {
-                console.log('date1' + this.tableData3[index].pdt_id)
+                console.log('date1' + this.apitable[index].api_id)
                 // 格局id删除数据
-                var obj = {pdt_id: this.tableData3[index].pdt_id}
-                this.tableData3.splice(index, 1)
+                var obj = {api_id: this.apitable[index].api_id}
+                this.apitable.splice(index, 1)
                 // var url = '/api/product/delproduct'
                 // 发送异步请求
                 axios({
-                    url: ''+host+'/',
+                    url: ''+host+'/api/apiinfo/api',
                     method: 'delete',
                     dataType: 'json',
                     headers: {
@@ -274,10 +299,10 @@
                     data: JSON.stringify(obj),
                 }).then(res => {
                     if (res.status === 200) {
-                        alert('success')
+                        alert("success")
                         // 更新数据
                         console.log(res.message)
-                        this.tableData3.splice(index, 1)
+                        this.apitable.splice(index, 1)
                     } else {
                         alert(res.message)
                     }
@@ -326,19 +351,38 @@
             },
             //弹窗点击确定
             ok () {
-                console.log("123:"+JSON.stringify(this.formValidate));
+                console.log("点击确定:"+JSON.stringify(this.api_api));
+                console.log("点击确定id:"+this.formValidate[this.api_pdt].pdt_id);
+                console.log("点击确定method:"+this.api_api.method);
+                console.log("点击确定method2:"+this.api_api.input_proto);
+                console.log("点击确定method3:"+this.api_api.message);
+                console.log("点击确定method4:"+this.api_api.has_token);
+                let  obj={
+                        "pdt_id":this.formValidate[this.api_pdt].pdt_id,
+                        "method":this.api_api.method,
+                        "header":this.api_api.produces,
+                        "body":this.api_api.parameters,
+                        "api_name":this.api_api.summary,
+                        "values":"",
+                          "url":this.api_api.uri,
+                        "has_token":this.api_api.has_token,
+                        "proto_message":this.api_api.message,
+                        "proto_file":this.api_api.input_proto
+
+                    }
+                    console.log(obj)
                 axios({
-                    url: ''+host+'/api/product/addproducts',
+                    url: ''+host+'/api/apiinfo/api',
                     method: 'post',
                     dataType: 'json',
                     headers: {
                         'Content-type': 'application/json;'
                     },
-                    data: JSON.stringify(this.formValidate),
+                    data: JSON.stringify(obj),
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                    location.reload()
+                    //location.reload()
 
                 })
                     .catch(function(error){
