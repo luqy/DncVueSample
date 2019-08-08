@@ -17,7 +17,25 @@
   <div style="height: 600px">
     <i-Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
       <Form-Item label="产品名称" prop="pdt_name">
-        <i-Input v-model="formValidate.pdt_name" placeholder="Enter your pdt_name"></i-Input>
+        <RadioGroup v-model="phone">
+          <Radio label="apple">
+            <Icon type="logo-apple"></Icon>
+            <span>Apple</span>
+          </Radio>
+          <Radio label="android">
+            <Icon type="logo-android"></Icon>
+            <span>Android</span>
+          </Radio>
+          <Radio label="windows">
+            <Icon type="logo-windows"></Icon>
+            <span>Windows</span>
+          </Radio>
+        </RadioGroup>
+        <RadioGroup v-model="animal">
+          <Radio label="金斑蝶"></Radio>
+          <Radio label="爪哇犀牛"></Radio>
+          <Radio label="印度黑羚"></Radio>
+        </RadioGroup>
       </Form-Item>
       <Form-Item label="产品版本" prop="version">
         <i-Input v-model="formValidate.version" placeholder="Enter your version"></i-Input>
@@ -50,6 +68,8 @@
     el: "#app",
     data() {
       return {
+        phone: 'apple',
+        animal: '爪哇犀牛',
         formValidate: {
           pdt_name: '',
           version: '',
