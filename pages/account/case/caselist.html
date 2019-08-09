@@ -23,8 +23,8 @@
 
     >
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-            <Form-item label="用例名称" prop="pdt_name">
-                <i-input v-model="formValidate.pdt_name" placeholder="请输入产品名称"></i-input>
+            <Form-item label="用例名称" prop="case_name">
+                <i-input v-model="casedate.case_name" placeholder="请输入产品名称"></i-input>
             </Form-item>
             <Form-item label="所属产品" prop="version">
                 <i-Select v-model="case_pdt0" size="large" style="width:100px" >
@@ -32,43 +32,70 @@
                 </i-Select>
             </Form-item>
             <Form-item label="类型" prop="host">
-                <Radio-Group v-model="formValidate.pdt_name" >
+                <Radio-Group v-model="casedate.type_id" >
                     <Radio label="1">性能</Radio>
                     <Radio label="2">接口</Radio>
                 </Radio-Group>
             </Form-item>
-            <Form-item label="API列表" >
-            <!--<cell-group>
-                        <Cell title="With Switch">
-                            <Form-item label="123" >
-                                                <Radio-Group v-model="formValidate.version">
-                    <Radio label="1">性能</Radio>
-                    <Radio label="2">接口</Radio>
-                </Radio-Group>
-                                <i-input style="width:100px" v-model="formValidate.version" placeholder="请输入产品版本号 "></i-input>
-                            </Form-item>
+            <Form-item label="性能API列表"   v-if="casedate.type_id === '1'">
 
-                        </Cell>
+ <!--               <CheckboxGroup v-model="case_token" v-for="(item,index) in case_apidata">
+                <p><i-input type="text" style="width:50px" v-model="case_input" style="align:left" ></i-input>
+                    <input type="checkbox" v-model="case_token" value="123">{{case_apidata[index].api_name}}
+                   </p>
+                </CheckboxGroup>-->
+                <dl v-for="(item,index) in case_apidata" :key="index">
+                    {{case_apidata[index].api_name}}
+                    <label>
+                        <input type="checkbox" v-model="case_token" :value="item.api_id">
+                        <span>
+                        <i class="iconfont no icon-hook-round"></i>
+                        <i class="https://www.cnblogs.com/wuheng1991/p/7575464.html"></i>
+                    </span>
+                        <i-input type="text" style="width:50px" v-model="case_apidata[index].api_id" style="align:left" ></i-input>
+                        <i-input type="text" style="width:50px" v-model="case_input" :value="item.api_id" ></i-input>
+                    </label>
 
+                </dl>
 
+                <!--<ul>
+                    <ol v-for="(item,index) in case_apidata" >
+&lt;!&ndash;                        <div>请选择你的爱好(vue)</div>
+                        <p><input type="checkbox" v-model="case_token" value="游泳">{{case_apidata[index].api_name}}</p>
+                        <input type="checkbox" v-model="case_token" value="健身">健身2
+                        <input type="checkbox" v-model="case_token" value="旅游">旅游3&ndash;&gt;
+                       &lt;!&ndash; <input type="checkbox" v-model="case_token" value=' + item.api_id + ' >{{item.api_name}}1&ndash;&gt;
 
-                </cell-group>
+                          &lt;!&ndash;  <Checkbox  v-model="case_token" > {{case_apidata[index].api_name}}</Checkbox>&ndash;&gt;
+&lt;!&ndash;                        <Poptip trigger="hover"  content="index">
+                            <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
+                        </Poptip>
+                        <Tooltip placement="top" max-width="200" theme="light">
+                            <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
+                            <div slot="content">
+                                {{case_apidata[index].api_name}}
 
--->
+                            </div>
+                        </Tooltip>&ndash;&gt;
+                        <i-input type="text" style="width:50px" v-model="case_apidata[index].api_id" style="align:left" ></i-input>
+                    </ol>
+                </ul>-->
+            </Form-item>
+            <Form-item label="接口API列表"   v-if="casedate.type_id === '2'">
                 <ul>
                     <ol v-for="(item,index) in case_apidata">
                         <Checkbox v-model="case_apidata[index].has_token" ></Checkbox>
-<!--                        <Poptip trigger="hover"  content="index">
-                            <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
-                        </Poptip>-->
-                        <Tooltip placement="top" max-width="2000" theme="light">
-                            <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
+                        <!--                        <Poptip trigger="hover"  content="index">
+                                                    <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
+                                                </Poptip>-->
+                        <Tooltip placement="top" max-width="200" theme="light">
+                            <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
                             <div slot="content">
                                 {{case_apidata[index].api_name}}
 
                             </div>
                         </Tooltip>
-                        <i-input type="text" style="width:50px" v-model="case_apidata[index].api_id" style="align:left" ></i-input>
+                        <i-input type="text" style="width:150px" v-model="case_apidata[index].api_id" style="align:left" ></i-input>
                     </ol>
                 </ul>
             </Form-item>
@@ -116,9 +143,26 @@
         el: "#app",
         data: function () {
             return {
+                checkedNames:[],
                 case_pdt0:'',
                 case_pdt:'',
                 case_apidata:'',
+                case_token:[],
+                case_input:[],
+                casedate:[{
+                    "case_name": "按需服务1",
+                    "api_weight": [
+                        {
+                            "api_id": "20",
+                            "weight": "1"
+                        },
+                        {
+                            "api_id": "21",
+                            "weight": "1"
+                        },
+                    ],
+                    "type_id": 1,
+                }],
                 editFormVisible:false,
                 editFormRules: {
                     name: [
@@ -136,7 +180,7 @@
                 },
                 modal1: false,
                 formValidate: {
-                   type_id:'杭州',
+                   type_id:'1',
                 },
                 ruleValidate: {
                     pdt_name: [
@@ -347,11 +391,11 @@
             },
             //添加弹窗点击确定
             ok () {
-                let api_json = JSON.parse(this.formValidate.api_json )
-                this.formValidate.api_json=api_json
-                console.log("123:"+JSON.stringify(this.formValidate));
+                //let api_json = JSON.parse(this.case_api )
+                //this.formValidate.api_json=api_json
+                console.log("case_api:"+JSON.stringify(this.case_token));
                 axios({
-                    url: ''+host+'/api/product/addproducts',
+                    //url: ''+host+'/api/product/addproducts',
                     method: 'post',
                     dataType: 'json',
                     headers: {
@@ -361,7 +405,7 @@
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                    location.reload()
+                    //location.reload()
 
                 })
                     .catch(function(error){
