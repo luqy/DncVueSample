@@ -47,13 +47,10 @@
                 <dl v-for="(item,index) in case_apidata" :key="index">
                     {{case_apidata[index].api_name}}
                     <label>
-                        <input type="checkbox" v-model="case_token" :value="item.api_id">
-                        <span>
-                        <i class="iconfont no icon-hook-round"></i>
-                        <i class="https://www.cnblogs.com/wuheng1991/p/7575464.html"></i>
-                    </span>
-                        <i-input type="text" style="width:50px" v-model="case_apidata[index].api_id" style="align:left" ></i-input>
-                        <i-input type="text" style="width:50px" v-model="case_input" :value="item.api_id" ></i-input>
+                        <input type="checkbox" v-model="case_token[index]" :value="item.api_id">
+                        <i-input type="text" style="width:50px" v-model="item.api_id" style="align:left" ></i-input>
+                        <input type="text" v-model="case_input[index]" >
+                        <i-input type="text"style="width:50px"  name="weight" v-model="case_input" id="name+'+item.api_id+'">
                     </label>
 
                 </dl>
@@ -84,7 +81,7 @@
             <Form-item label="接口API列表"   v-if="casedate.type_id === '2'">
                 <ul>
                     <ol v-for="(item,index) in case_apidata">
-                        <Checkbox v-model="case_apidata[index].has_token" ></Checkbox>
+                        <Checkbox v-model="case_token[index]" ></Checkbox>
                         <!--                        <Poptip trigger="hover"  content="index">
                                                     <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
                                                 </Poptip>-->
@@ -95,7 +92,7 @@
 
                             </div>
                         </Tooltip>
-                        <i-input type="text" style="width:150px" v-model="case_apidata[index].api_id" style="align:left" ></i-input>
+                        <i-input type="text" style="width:150px" v-model="case_input[index]" style="align:left" ></i-input>
                     </ol>
                 </ul>
             </Form-item>
@@ -317,14 +314,14 @@
 
             //删除按钮
             remove: function (index) {
-                console.log('date1' + this.tableData3[index].pdt_id)
+                console.log('date1' + this.tableData3[index].case_id)
                 // 格局id删除数据
-                var obj = {pdt_id: this.tableData3[index].pdt_id}
+                var obj = {case_id: this.tableData3[index].case_id}
                 this.tableData3.splice(index, 1)
                 // var url = '/api/product/delproduct'
                 // 发送异步请求
                 axios({
-                    url: ''+host+'/api/product/delproduct',
+                    url: ''+host+'/api/caseinfo/case',
                     method: 'delete',
                     dataType: 'json',
                     headers: {
@@ -390,18 +387,84 @@
                                   })*/
             },
             //添加弹窗点击确定
-            ok () {
+            ok :function (){
                 //let api_json = JSON.parse(this.case_api )
                 //this.formValidate.api_json=api_json
+                console.log("case_api:"+JSON.stringify(this.case_input));
                 console.log("case_api:"+JSON.stringify(this.case_token));
+                console.log("case_api2:"+this.casedate.type_id );
+                var weight_api0='';
+                var expection0='';
+                var weight_api=[];//性能1
+                var expection=[];//接口2
+                for(var i=0;i<this.case_token.length;i++){
+                        console.log("api_id:"+this.case_apidata[i].api_id);
+                        console.log("api_id2:"+this.case_input[i]);
+                        if(this.case_token[i]===true){
+                            if(this.case_input[i]===undefined){
+                                this.case_input[i]='1';
+                                if(this.casedate.type_id==='1'){
+                                weight_api0={
+                                    "api_id":this.case_apidata[i].api_id,
+                                    "weight":this.case_input[i]
+                                }} else if(this.casedate.type_id==='2'){
+                                    expection0={
+                                        "api_id":this.case_apidata[i].api_id,
+                                        "expection":JSON.parse(this.case_input[i])
+                                    }
+                                }
+                                console.log("api_id3:"+JSON.stringify(expection0));
+                                weight_api.push(weight_api0);
+                                expection.push(expection0);
+                                console.log("api_id5:"+JSON.stringify(expection0))
+
+                            }else
+                            {
+                                if(this.casedate.type_id==='1'){
+                                    weight_api0={
+                                        "api_id":this.case_apidata[i].api_id,
+                                        "weight":this.case_input[i]
+                                    }}
+                                else if(this.casedate.type_id==='2'){
+                                    expection0={
+                                        "api_id":this.case_apidata[i].api_id,
+                                        "expection":JSON.parse(this.case_input[i])
+                                    }
+                                }
+                                console.log("api_id7:"+JSON.stringify(weight_api0));
+                                weight_api.push(weight_api0);
+                                expection.push(expection0);
+                                console.log("api_id6:"+JSON.stringify(weight_api))
+                            }
+
+                        }
+
+
+                    }
+                console.log("api_id8:"+JSON.stringify(weight_api))
+                console.log("api_id9:"+JSON.stringify(expection))
+/*                if(this.casedate.type_id==='1'){
+                    obj={
+                        "case_name":this.
+                    }
+                }else if(this.casedate.type_id==='2'){
+
+                }*/
+                     var obj={
+                         "case_name":this.casedate.case_name,
+                         "api_weight":weight_api,
+                         "type_id":this.casedate.type_id,
+                         "api_expection":expection,
+                     }
+                     console.log("api_id10:"+JSON.stringify(obj))
                 axios({
-                    //url: ''+host+'/api/product/addproducts',
+                    url: ''+host+'/api/caseinfo/case',
                     method: 'post',
                     dataType: 'json',
                     headers: {
                         'Content-type': 'application/json;'
                     },
-                    data: JSON.stringify(this.formValidate),
+                    data: JSON.stringify(obj),
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
