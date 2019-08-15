@@ -172,6 +172,7 @@
                 columns.push({
                     title: '产品名称',
                     key: 'pdt_id',
+                    formatter:"table_pdt"
 /*                    filters:filters_name1 ,
                     filterMethod (value, row) {
                         console.log(value)
@@ -280,6 +281,9 @@
         mounted:function(){
         },
         methods:{
+            table_pdt:function(row,column){
+
+            },
             //删除按钮
             remove: function (index) {
                 console.log('date1' + this.apitable[index].api_id)

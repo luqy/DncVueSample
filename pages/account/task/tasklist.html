@@ -24,7 +24,7 @@
     >
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
             <Form-item label="任务名称" prop="task_name">
-                <i-input v-model="formValidate.task_name" placeholder="请输入产品名称"></i-input>
+                <i-input v-model="task_name" placeholder="请输入产品名称"></i-input>
             </Form-item>
             <Form-item label="类型" prop="host">
                 <Radio-Group v-model="task_typeID" >
@@ -33,43 +33,27 @@
                 </Radio-Group>
             </Form-item>
             <Form-item label="性能CASE列表"   v-if="task_typeID=== '1'">
-                <ul>
-                    <ol v-for="(item,index) in case_apidata">
-                        <Checkbox v-model="case_token[index]" ></Checkbox>
-                        <!--                        <Poptip trigger="hover"  content="index">
-                                                    <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
-                                                </Poptip>-->
-                        <Tooltip placement="top" max-width="200" theme="light">
-                            <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
-                            <div slot="content">
-                                {{case_apidata[index].api_name}}
+                <dl v-for="(item,index) in performance" :key="item">
+                    <label>
+                        <input type="checkbox" v-model="case_token" :value="item">
+                    </label>
+                    {{item.case_name}}
 
-                            </div>
-                        </Tooltip>
-                    </ol>
-                </ul>
+                </dl>
             </Form-item>
             <Form-item label="接口CASE列表"   v-if="task_typeID=== '2'">
-                <ul>
-                    <ol v-for="(item,index) in case_apidata">
-                        <Checkbox v-model="case_token[index]" ></Checkbox>
-                        <!--                        <Poptip trigger="hover"  content="index">
-                                                    <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
-                                                </Poptip>-->
-                        <Tooltip placement="top" max-width="200" theme="light">
-                            <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
-                            <div slot="content">
-                                {{case_apidata[index].api_name}}
+                <dl v-for="(item,index) in interface" :key="index">
+                    <label >
+                        <input type="checkbox" v-model="case_token" :value="item">
+                    </label>
+                    {{item.case_name}}
 
-                            </div>
-                        </Tooltip>
-                    </ol>
-                </ul>
+                </dl>
             </Form-item>
         </i-form>
 
     </Modal>
-    <i-Table :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+    <i-Table :loading="loading" :border="showBorder" :stripe="showStripe" :show-header="showHeader"
              :height="fixedHeader ? 250 : ''" :size="tableSize" :data="tableData3" :columns="tableColumns3"></i-Table>
 
     <Modal
@@ -110,6 +94,8 @@
         el: "#app",
         data: function () {
             return {
+                loading: false,
+                task_name:'',
                 checkedNames:[],
                 case_pdt0:'',
                 case_pdt:'',
@@ -176,23 +162,43 @@
                 showIndex: false, // 是否显示索引
                 showCheckbox: true, // 显示多选框
                 fixedHeader: false, // 显示滑动
-                tableSize: 'default'
+                tableSize: 'default',
+                interface:[],
+                performance:'',
+
             }
         },
         watch:{
 task_typeID(val,oldval){
-    if(val==='1'){
+    var  performance0=[];
+    var  interface0=[];
         console.log("val:"+val);
         for(var i=0;i<this.case_pdt.length;i++){
-            if(this.case_pdt[i].type_id==='1'){
-                this.interface=
+            if(this.case_pdt[i].type_id===1){
+                performance0.push({
+                    case_id:this.case_pdt[i].case_id,
+                    case_name:this.case_pdt[i].case_name,
+                })
+                //console.log("performance0:"+performance0)
+            }
+            else if(this.case_pdt[i].type_id===2){
+                interface0.push({
+                    case_id:this.case_pdt[i].case_id,
+                    case_name:this.case_pdt[i].case_name,
+                })
+                //console.log("interface0:"+interface0)
+
             }
         }
-    }
+    this.performance=performance0;
+    this.interface=interface0;
+/*    console.log("performance1:"+performance0)
+    console.log("interface1:"+interface0)
+    console.log("interfance2:"+JSON.stringify(this.interface))*/
 }
         },
         computed: {
-            tableColumns3 () {
+            tableColumns3: function () {
                 let columns = []
                 if (this.showCheckbox) {
                     columns.push({
@@ -211,7 +217,8 @@ task_typeID(val,oldval){
                 columns.push({
                     title: 'ID',
                     key: 'task_id',
-                    sortable: true
+                    sortable: true,
+
                 })
 
                 columns.push({
@@ -219,53 +226,76 @@ task_typeID(val,oldval){
                     key: 'task_name'
                 });
                 columns.push({
-                    title: '任务类型',
-                    key: 'type_id'
+                    title: '运行状态',
+                    key: 'task_status',
+                    width:200,
                 });
                 columns.push({
-                    title: '任务状态',
+                    title: '任务类型',
+                    key: 'type_id',
+                    render: (h, params) => {
+                        return  h('span',params.row.type_id === 1 ?'性能' : params.row.type_id === 2? '接口' : '未知')
+                    }
+                });
+                columns.push({
+                    title: '运行参数',
+                    key: 'parameter',
+                    tooltip:true,
+                    width:500,
+                });
+                columns.push({
+                    title: '任务执行',
                     key: 'action',
                     render: (h, params) => {
                         return h('div', [
                             h('Button', {
                                 props: {
-                                    type: 'primary',
-                                    size: 'small'
+
+                                    icon:"md-paper",//生成脚本
+                                    size: 'buttonSize'
                                 },
                                 style: {
                                     marginRight: '5px'
                                 },
                                 on: {
                                     click: () => {
-                                        this.addsript(params.index)
+                                        this.addsript(params.row)
                                     }
                                 }
-                            }, 'locust'),
+                            }),
                             h('Button', {
                                 props: {
-                                    type: 'error',
-                                    size: 'small'
+                                    icon:"md-play",//运行
+
+                                    size: 'buttonSize'
+
                                 },
                                 style: {
-                                    marginRight: '5px'
+                                    marginRight: '5px',
+                                    display:(params.row.task_status===true)?"none":"inline-block",
                                 },
                                 on: {
                                     click: () => {
-                                        this.run(params.index)
+                                        this.taskrun(params.row)
                                     }
                                 }
-                            }, 'run'),
+                            }),
                             h('Button', {
                                 props: {
-                                    type: 'error',
-                                    size: 'small'
+                                    icon:"md-pause",//停止
+
+                                    size: 'buttonSize'
+                                },
+                                style: {
+                                    marginRight: '5px',
+                                    display:(params.row.task_status===false)?"none":"inline-block",
                                 },
                                 on: {
                                     click: () => {
-                                        this.stop(params.index)
+                                        this.taskstop(params.row)
                                     }
                                 }
-                            }, 'stop')
+                            }, ),
                         ])
                     }
                 })
@@ -277,7 +307,9 @@ task_typeID(val,oldval){
                             h('Button', {
                                 props: {
                                     type: 'primary',
-                                    size: 'small'
+                                    icon:"ios-create-outline",//编辑
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 style: {
                                     marginRight: '5px'
@@ -287,27 +319,30 @@ task_typeID(val,oldval){
                                         this.show(params.index)
                                     }
                                 }
-                            }, 'View'),
+                            },'编辑'),
                             h('Button', {
                                 props: {
                                     type: 'error',
-                                    size: 'small'
+                                    icon:"ios-trash-outline",//删除
+                                    shape:"circle",
+
+                                    size: 'buttonSize'
                                 },
                                 on: {
                                     click: () => {
                                         this.remove(params.index)
                                     }
                                 }
-                            }, 'Delete')
+                            },'删除')
                         ])
                     }
                 })
-                console.log("columns"+JSON.stringify(columns))
+                console.log("columns" + JSON.stringify(columns))
                 return columns
             }
         },
         created:function(){
-            axios.get(''+host+'/api/taskinfo/tasklist')
+            axios.get(''+host+'/api/taskinfo/taskmagager')
                 .then(res => {
                     console.log(res)
                     /*this.tableData3 = res.data.message*/
@@ -340,7 +375,64 @@ task_typeID(val,oldval){
             console.log("task:"+this.tableData3.length)
         },
         methods:{
+            //脚本生成
+            addsript:function(event) {
+                console.log("cs；" + JSON.stringify(event))
+                if (event.type_id === 1) {
+                    console.log("cs1；" + event.task_id)
+                    axios.get('' + host + '/api/taskscript-performance?task_id=' + event.task_id + '')
+                        .then(res => {
+                            console.log(res)
+                            alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
+                        })
+                        .catch(function (error) {
+                            (error)
+                        });
+                } else if (event.type_id === 2) {
+                    console.log("cs2；" + JSON.stringify(event))
+                    axios.get('' + host + '/api/taskscript-interface?task_id=' + event.task_id + '')
+                        .then(res => {
+                            console.log(res)
+                            alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
+                        })
+                        .catch(function (error) {
+                            alert(error)
+                        });
+                }
+            },
+            //运行停止
+            taskrun:function(event){
+                console.log("taskrun；" + JSON.stringify(event))
+                if (event.type_id === 1) {
+                    console.log("run1；" + event.task_id)
+                    axios.get('' + host + '/api/task-performance?order=1&task_id=' + event.task_id + '')
+                        .then(res => {
+                            console.log(res)
+                            alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
+                        })
+                        .catch(function (error) {
+                            (error)
+                        });
+                } else if (event.type_id === 2) {
+                    this.loading=true;
+                    console.log("cs2；" + JSON.stringify(event))
+/*                    axios.get('' + host + '/api/task-interface?task_id=' + event.task_id + '')
+                        .then(res => {
+                            console.log(res)
+                            alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
+                        })
+                        .catch(function (error) {
+                            alert(error)
+                        });*/
+                axios.interceptors.request.use(config=>{
+                    config.baseURL='' + host + '/api/task-interface?task_id=' + event.task_id + '',
+                        config.tiemout=6000;
+                })
+                }
+    },
+            taskstop:function(index){
 
+            },
             //删除按钮
             remove: function (index) {
                 console.log('date1' + this.tableData3[index].pdt_id)
@@ -419,75 +511,42 @@ task_typeID(val,oldval){
             ok :function (){
                 //let api_json = JSON.parse(this.case_api )
                 //this.formValidate.api_json=api_json
-                console.log("case_api:"+JSON.stringify(this.case_input));
-                console.log("case_api:"+JSON.stringify(this.case_token));
-                console.log("case_api2:"+this.casedate.type_id );
-                var weight_api0='';
-                var expection0='';
-                var weight_api=[];//性能1
-                var expection=[];//接口2
-                for(var i=0;i<this.case_token.length;i++){
-                    console.log("api_id:"+this.case_apidata[i].api_id);
-                    console.log("api_id2:"+this.case_input[i]);
-                    if(this.case_token[i]===true){
-                        if(this.case_input[i]===undefined){
-                            this.case_input[i]='1';
-                            if(this.casedate.type_id==='1'){
-                                weight_api0={
-                                    "api_id":this.case_apidata[i].api_id,
-                                    "weight":this.case_input[i]
-                                }} else if(this.casedate.type_id==='2'){
-                                expection0={
-                                    "api_id":this.case_apidata[i].api_id,
-                                    "expection":JSON.parse(this.case_input[i])
-                                }
-                            }
-                            console.log("api_id3:"+JSON.stringify(expection0));
-                            weight_api.push(weight_api0);
-                            expection.push(expection0);
-                            console.log("api_id5:"+JSON.stringify(expection0))
-
-                        }else
-                        {
-                            if(this.casedate.type_id==='1'){
-                                weight_api0={
-                                    "api_id":this.case_apidata[i].api_id,
-                                    "weight":this.case_input[i]
-                                }}
-                            else if(this.casedate.type_id==='2'){
-                                expection0={
-                                    "api_id":this.case_apidata[i].api_id,
-                                    "expection":JSON.parse(this.case_input[i])
-                                }
-                            }
-                            console.log("api_id7:"+JSON.stringify(weight_api0));
-                            weight_api.push(weight_api0);
-                            expection.push(expection0);
-                            console.log("api_id6:"+JSON.stringify(weight_api))
-                        }
-
+                console.log("task_list:"+JSON.stringify(this.case_token));
+                console.log("task_name:"+JSON.stringify(this.task_name));
+                console.log("task_typeID:"+JSON.stringify(this.task_typeID));
+                if(this.task_typeID==='1'){
+                    var obj={
+                        "task_name":this.task_name,
+                        "associated_case":this.case_token,
+                        "task_status": false,
+                        "locust_cl": [
+                            {
+                                "need": 1,
+                                "parameter": "--host=127.0.0.1"
+                            },
+                            {
+                                "need": 1,
+                                "parameter": "--web-host=192.168.1.21"
+                            },
+                            {
+                                "need": 1,
+                                "parameter": "--web-port=8182"
+                            }],
+                        "pytest_para":[]
                     }
-
-
+                }else if(this.task_typeID==='2'){
+                    var obj={
+                        "task_name":this.task_name,
+                        "associated_case":[],
+                        "task_status": false,
+                        "locust_cl":[],
+                        "pytest_para":this.case_token
+                    }
                 }
-                console.log("api_id8:"+JSON.stringify(weight_api))
-                console.log("api_id9:"+JSON.stringify(expection))
-                /*                if(this.casedate.type_id==='1'){
-                                    obj={
-                                        "case_name":this.
-                                    }
-                                }else if(this.casedate.type_id==='2'){
 
-                                }*/
-                var obj={
-                    "case_name":this.casedate.case_name,
-                    "api_weight":weight_api,
-                    "type_id":this.casedate.type_id,
-                    "api_expection":expection,
-                }
                 console.log("api_id10:"+JSON.stringify(obj))
                 axios({
-                    url: ''+host+'/api/caseinfo/case',
+                    //url: ''+host+'/api/caseinfo/case',
                     method: 'post',
                     dataType: 'json',
                     headers: {
