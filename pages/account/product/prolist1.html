@@ -216,14 +216,16 @@
                     key: 'description'
                 })
                 columns.push({
-                    title: 'Action',
+                    title: '操作',
                     key: 'action',
                     render: (h, params) => {
                         return h('div', [
                             h('Button', {
                                 props: {
                                     type: 'primary',
-                                    size: 'small'
+                                    icon:"ios-create-outline",//编辑
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 style: {
                                     marginRight: '5px'
@@ -233,18 +235,20 @@
                                         this.show(params.index)
                                     }
                                 }
-                            }, 'View'),
+                            }, '编辑'),
                             h('Button', {
                                 props: {
                                     type: 'error',
-                                    size: 'small'
+                                    icon:"ios-trash-outline",//删除
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 on: {
                                     click: () => {
                                         this.remove(params.index)
                                     }
                                 }
-                            }, 'Delete')
+                            }, '删除')
                         ])
                     }
                 })

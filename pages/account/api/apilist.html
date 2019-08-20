@@ -24,23 +24,23 @@
 
         <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
             <Form-item label="所属产品" >
-                <i-Select v-model="api_pdt" size="large" style="width:100px" >
+                <i-Select v-model="api_pdt" size="large" style="width:100px" clearable="true" >
                     <i-Option v-for="(item,index) in formValidate ":key="item.pdt_id" :value="index">{{ item.pdt_name }}</i-Option>
                 </i-Select>
 
             </Form-item>
             <Form-item label="模块名称" prop="version">
-                <i-Select v-model="api_hashfunction" size="large" style="width:100px" >
+                <i-Select v-model="api_hashfunction"   clearable="true" size="large" style="width:100px" ref="store" >
                     <i-Option v-for="(item,index) in hash ":key="item" :value="item">{{ item }}</i-Option>
                 </i-Select>
             </Form-item>
             <Form-item label="API参数名" prop="host">
-                <i-Select v-model="api_summary" size="large" style="width:100px" >
+                <i-Select v-model="api_summary" size="large" style="width:100px"  clearable="true"   ref="store1" @on-change='change_pro(api_pdt)'>
                     <i-Option v-for="(item,index) in api_summary1 ":key="index" :value="index">{{ item.summary }}</i-Option>
                 </i-Select>
             </Form-item>
             <Form-item label="API名称" prop="description">
-                <i-input v-model="api_api.summary" placeholder="请输入产品描述"></i-input>
+                <i-input v-model="api_api.summary" placeholder="请输入产品描述" clearable="true"   ref="store3"></i-input>
             </Form-item>
             <Form-item label="HTTP请求方式" prop="description">
                 <i-select  v-model="api_api.method" style="width:200px" >
@@ -50,10 +50,10 @@
                 </i-select>
             </Form-item>
             <Form-item label="URL" prop="description">
-                <i-input v-model="api_api.uri " placeholder="请输入产品描述"></i-input>
+                <i-input v-model="api_api.uri " placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
             </Form-item>
             <Form-item label="Header" prop="description">
-                <i-input  v-model="api_api.produces" placeholder="请输入产品描述"></i-input>
+                <i-input  v-model="api_api.produces" placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
             </Form-item>
             <Form-item label="Token" >
                 <i-switch  v-model="api_api.has_token"  size="large">
@@ -62,19 +62,61 @@
                 </i-switch>
             </Form-item>
             <Form-item label="proto_file" prop="description" >
-                <i-input  v-model="api_api.input_proto" placeholder="请输入产品描述"></i-input>
+                <i-input  v-model="api_api.input_proto" placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
             </Form-item>
             <Form-item label="proto_msg" prop="description" >
-                <i-input  v-model="api_api.message" placeholder="请输入产品描述"></i-input>
+                <i-input  v-model="api_api.message" placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
             </Form-item>
             <Form-item label="Body" prop="api_json">
-                <i-input v-model="api_api.parameters" placeholder="请输入接口字符串"></i-input>
+                <i-Input v-model='api_api.parameters' type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入接口字符串"></i-Input>
+            </Form-item>
+        </i-form>
+
+    </Modal>
+    <Modal
+            v-model="editFormVisible"
+            title="编辑接口"
+            @on-ok="update"
+            @on-cancel="cancel"
+    >
+        <i-form ref="editForm" :model="editForm" :rules="ruleValidate" :label-width="80">
+            <Form-item label="API名称" prop="description">
+                <i-input v-model="editForm.api_name" placeholder="请输入产品描述" clearable="true"   ref="store3"></i-input>
+            </Form-item>
+            <Form-item label="HTTP请求方式" prop="description">
+                <i-select  v-model="editForm.method" style="width:200px" >
+                    <i-Option  value="post">POST</i-option>
+                    <i-Option value="get">GET</i-Option>
+                    <i-Option  value="put">PUT</i-option>
+                </i-select>
+            </Form-item>
+            <Form-item label="URL" prop="description">
+                <i-input v-model="editForm.url " placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
+            </Form-item>
+            <Form-item label="Header" prop="description">
+                <i-input  v-model="editForm.header" placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
+            </Form-item>
+            <Form-item label="Token" >
+                <i-switch  v-model="editForm.has_token"  size="large">
+                    <span slot="open">On</span>
+                    <span slot="close">Off</span>
+                </i-switch>
+            </Form-item>
+            <Form-item label="proto_file" prop="description" >
+                <i-input  v-model="editForm.proto_file" placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
+            </Form-item>
+            <Form-item label="proto_msg" prop="description" >
+                <i-input  v-model="editForm.proto_message" placeholder="请输入产品描述" clearable="true"   ref="store2"></i-input>
+            </Form-item>
+            <Form-item label="Body" prop="api_json">
+                <i-Input v-model='editForm.body' type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入接口字符串"></i-Input>
             </Form-item>
         </i-form>
 
     </Modal>
     <i-table :border="showBorder" :stripe="showStripe" :show-header="showHeader" :height="fixedHeader ? 300 : ''"
-             :size="tableSize" :data="apitable" :columns="apiColumns"></i-table>
+             :size="tableSize" :data="apitable" :columns="apiColumns" ></i-table>
+
 
 </div>
 <script type="text/javascript">
@@ -84,14 +126,15 @@
             return {
                 modal1: false,
                 api_pdt:'',
-                api_hashfunction:'',
-                api_function:'',
-                api_summary:'',
-                api_summary1:'',//数据结构
+                hash:[],//存储模块名称
+                api_hashfunction:'',//模块名称
+                api_function:'',//存储对应产品的API-json
+                api_summary:'',//API名称
+                api_summary1:'',//存储模块名称
                 api_api:{
                     has_token: false,
-                },//api相关数据
-                formValidate: {},//数据存储
+                },//存储api相关数据
+                formValidate: {},//产品列表数据存储
                 ruleValidate: {
                     pdt_name: [
                         { required: true, message: '产品名称不能为空', trigger: 'blur' }
@@ -109,9 +152,18 @@
                         { required: true, message: '产品接口字符串不能为空', trigger: 'blur' }
                     ]
                 },
-                apitable: [],
-                hash:[],
-                pro:'',
+                apitable: [],//api列表数据存储
+
+                editFormVisible:false,
+                editForm: {
+                    pdt_id:'' ,
+                    pdt_name: '',
+                    version: '',
+                    host: '',
+                    description: '',
+                    api_json:'',
+
+                },//修改模块
                 showBorder: false, // 显示边框
                 showStripe: true, // 是否显示斑马纹
                 showHeader: true, // 是否显示头部信息
@@ -146,70 +198,80 @@
                 columns.push({
                     title: 'API名称',
                     key: 'api_name',
+                    align: 'center',
                     sortable: true
                 });
                 columns.push({
                     title: 'method',
-                    key: 'method'
+                    key: 'method',
+                    align: 'center',
+                    sortable: true
                 });
                 //console.log("length1:"+this.api_pdt.length)
-              /*  var filters_name1=[];
-                for(var i = 0; i <this.api_pdt.length; i++){
+                var filters_name1=[];
+                for(var i = 0; i <this.formValidate.length; i++){
                     var filters_name0={
-                        label:this.api_pdt[i].pdt_name,
-                        value: this.api_pdt[i].pdt_name
-                    }
-                    for(var j=0;j<this.apitable.length;j++){
-                        if(this.api_pdt[i].pdt_id===this.apitable[j].pdt_id){
-                            //this.apitable[j].push(this.api_pdt[i].pdt_name)
-                            console.log("this.apitable"+this.apitable)
-                        }
+                        label:this.formValidate[i].pdt_name,
+                        value: this.formValidate[i].pdt_name
                     }
                     filters_name1.push(filters_name0);
                 }
                 console.log("file:"+JSON.stringify(filters_name1));
-                console.log("pdtName:"+JSON.stringify(this.pdtdesc))*/
                 columns.push({
                     title: '产品名称',
-                    key: 'pdt_id',
-                    formatter:"table_pdt"
-/*                    filters:filters_name1 ,
-                    filterMethod (value, row) {
-                        console.log(value)
-                        console.log(row.api_name)
-                        return row.pdt_id.indexOf(value) > -1
-                    }*/
+                    key: 'pdt_name',
+                    formatter:"table_pdt",
+                    align: 'center',
+                    sortable: true,
+                    filters:filters_name1,
+                    filterMethod (value,row) {
+/*                        console.log(value)
+                        console.log(row.api_name)*/
+                        return row.pdt_name.indexOf(value) > -1;
+                    }
+                });
+                columns.push({
+                    title: '接口参数',
+                    key: 'body',
+                    align: 'center',
+                    tooltip:true,
+
                 });
                 columns.push({
                     title: 'Action',
                     key: 'action',
+                    align: 'center',
                     render: (h, params) => {
                         return h('div', [
                             h('Button', {
                                 props: {
                                     type: 'primary',
-                                    size: 'small'
+                                    icon:"ios-create-outline",//编辑
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 style: {
-                                    marginRight: '5px'
+                                    marginRight: '5px',
                                 },
                                 on: {
                                     click: () => {
-                                        this.show(params.index)
+                                        this.show(params.row)
                                     }
                                 }
-                            }, 'View'),
+                            }, '编辑'),
                             h('Button', {
                                 props: {
                                     type: 'error',
-                                    size: 'small'
+                                    icon:"ios-trash-outline",//删除
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 on: {
                                     click: () => {
                                         this.remove(params.index)
                                     }
                                 }
-                            }, 'Delete')
+                            }, '删除')
                         ])
                     }
                 });
@@ -220,6 +282,8 @@
             //选择所属产品
             api_pdt(val,oldval){
                 this.hash=[],
+                    //this.$refs.store.clearSingleSelect()
+                    this.api_function=[],
                  this.api_function=this.formValidate[val].api_json;
                // console.log("function"+JSON.stringify(this.api_function))
                 for (var i = 0; i <this.api_function.length; i++) {
@@ -236,6 +300,7 @@
             api_hashfunction(val,oldval) {
                 console.log("hashfunctionn:" + val)
                this.api_summary1=[];
+                //this.$refs.store1.clearSingleSelect()
                // console.log("hashfunctionn:" + JSON.stringify(this.api_function))
                 for (i = 0; i < this.api_function.length; i++) {
                     //console.log("i："+apiarray.length)
@@ -246,13 +311,20 @@
                 }
             },
             //选择API
-            api_summary(){
+            api_summary(val,odlval){
+                console.log("hashfunctionn2:" + val)
+                this.api_api=[];
                 this.api_api=this.api_summary1[this.api_summary]
                 //console.log("push+function+summary22:"+JSON.stringify(this.api_api.produces))
                 this.api_api.produces=JSON.stringify(this.api_api.produces)
                 this.api_api.parameters=JSON.stringify(this.api_api.parameters)
                 this.api_api.has_token=false
 
+            },
+            //修改模块中的数据变化
+            editForm(){
+                this.editForm.header=JSON.stringify(this.editForm.header);
+                this.editForm.body=JSON.stringify(this.editForm.body);
             }
 
         },
@@ -281,9 +353,9 @@
         mounted:function(){
         },
         methods:{
-            table_pdt:function(row,column){
+           change_pro:function(status){
 
-            },
+           },
             //删除按钮
             remove: function (index) {
                 console.log('date1' + this.apitable[index].api_id)
@@ -314,45 +386,14 @@
                 })
             },
             //点击编辑
-            show: function (index) {
-                this.$Modal.confirm({
-                    title: '编辑产品',
-                    fullscreen: true,
-                    title: '编辑产品',
-                    content: `
-                              产品名称：<input size="35" prop="${this.tableData3[index].pdt_name}"/><br>
-                             <br>产品版本：<input  size="35"value="${this.tableData3[index].version}"/><br>
-                             <br>产品地址：<input size="35" value="${this.tableData3[index].host}"/><br>
-                             <br>产品描述：<input size="35" value="${this.tableData3[index].description}"/><br>
-                             <br>api_json ：<input  size="35" value=${JSON.stringify(this.tableData3[index].api_json)}/>`,
-                    onOk: () => {
-                        this.$Message.info('点击了确定');
-                        console.log("修改数据:" + JSON.stringify(this.tableData3[index].description));
-                        axios({
-                            url: '' + host + '/api/product/updateproduct',
-                            "method": "PUT",
-                            dataType: 'json',
-                            headers: {
-                                'Content-type': 'application/json;'
-                            },
-                            data: JSON.stringify(this.tableData3[index]),
-                        }).then(function (response) {
-                            console.log("修改产品：" + JSON.stringify(response))
-                            alert("操作:" + response.data.title + ",\n结果:" + response.data.message)
-                            location.reload()
-
-                        })
-                            .catch(function (error) {
-                                console.log(error)
-                            })
-
-                    },
-                    onCancel: () => {
-                        this.$Message.info('点击了取消');
-                    }
-                })
+            show: function (row) {
+                this.editFormVisible=true;
+                console.log("shouw"+JSON.stringify(row))
+                this.editForm=row;
+                //this.editForm.api_json=JSON.parse(this.editForm.api_json)
+                console.log("shouw1"+JSON.stringify(this.editForm))
             },
-            //弹窗点击确定
+            //弹窗点击确定添加
             ok () {
                 console.log("点击确定:"+JSON.stringify(this.api_api));
                 console.log("点击确定id:"+this.formValidate[this.api_pdt].pdt_id);
@@ -386,6 +427,30 @@
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
                     //location.reload()
+
+                })
+                    .catch(function(error){
+                        console.log(error)
+                    })
+
+            },
+            //编辑
+            update() {
+                console.log("修改:"+JSON.stringify(this.editForm));
+                this.editForm.header=JSON.parse(this.editForm.header);
+                this.editForm.body=JSON.parse(this.editForm.body);
+                axios({
+                    url: ''+host+'/api/apiinfo/api',
+                    method: 'put',
+                    dataType: 'json',
+                    headers: {
+                        'Content-type': 'application/json;'
+                    },
+                    data: this.editForm,
+                }).then(function (response){
+                    console.log(response)
+                    alert("操作:"+response.data.title+",\n结果:"+response.data.message)
+                    location.reload()
 
                 })
                     .catch(function(error){

@@ -51,6 +51,10 @@
                     })
                 }
                 columns.push({
+                    title: '任务id',
+                    key: 'task_id'
+                });
+                columns.push({
                     title: '报告名称',
                     key: 'report_name',
                     sortable: true
@@ -60,8 +64,8 @@
                     key: 'file_path'
                 });
                 columns.push({
-                    title: '任务id',
-                    key: 'task_id'
+                    title: '生成时间',
+                    key: 'create_date'
                 });
                 columns.push({
                     title: '操作',
@@ -82,17 +86,17 @@
                                     }
                                 }
                             }, '查看报告'),
-                            // h('Button', {
-                            //   props: {
-                            //     type: 'error',
-                            //     size: 'small'
-                            //   },
-                            //   on: {
-                            //     click: () => {
-                            //       this.down(params.index)
-                            //     }
-                            //   }
-                            // }, '报告下载')
+                            h('Button', {
+                              props: {
+                                type: 'error',
+                                size: 'small'
+                              },
+                              on: {
+                                click: () => {
+                                  this.down(params.index)
+                                }
+                              }
+                            }, '报告下载')
                         ])
                     }
                 });
@@ -115,10 +119,18 @@
         methods:{
             show:function (index) {
                 // 获取file_name
-                var fn = this.reporttable[index].file_path;
+                var fn = this.reporttable[index].report_name;
                 console.log("fn："+fn);
                 /*var host1 = axios.get(''+ host +'/api/report/access/'+fn+'')*/
                 window.open(''+ host +'/api/report/access/'+fn+'')
+            },
+            down:function (index) {
+                // 获取file_name
+                var fn = this.reporttable[index].report_name;
+                console.log("fn："+''+host+'/api/report/download/report_task20.html');
+                /*var host1 = axios.get(''+ host +'/api/report/access/'+fn+'')*/
+               /* window.open(''+ host +'/api/report/access/'+fn+'','_blank')*/
+                window.open(''+host+'/api/report/download/report_task20.html')
             }
         },
         // // 下载按钮

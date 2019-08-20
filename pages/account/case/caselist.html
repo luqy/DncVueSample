@@ -44,7 +44,7 @@
                     <input type="checkbox" v-model="case_token" value="123">{{case_apidata[index].api_name}}
                    </p>
                 </CheckboxGroup>-->
-                <dl v-for="(item,index) in case_apidata" :key="index">
+<!--                <dl v-for="(item,index) in case_apidata" :key="index">
                     {{case_apidata[index].api_name}}
                     <label>
                         <input type="checkbox" v-model="case_token[index]" :value="item.api_id">
@@ -53,8 +53,29 @@
                         <i-input type="text"style="width:50px"  name="weight" v-model="case_input" id="name+'+item.api_id+'">
                     </label>
 
-                </dl>
+                </dl>-->
+                <ul>
+                    <ol>
+                        <div slot="content">
+                        接口名称
+                    </div>
+                        <div>接口</div>
+                    </ol>
+                    <ol v-for="(item,index) in case_apidata">
+                        <Checkbox v-model="case_token[index]" ></Checkbox>
+                        <!--                        <Poptip trigger="hover"  content="index">
+                                                    <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
+                                                </Poptip>-->
+                        <Tooltip placement="top" max-width="200" theme="light">
+                            <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
+                            <div slot="content">
+                                {{case_apidata[index].api_name}}
 
+                            </div>
+                        </Tooltip>
+                        <i-input type="text" style="width:150px" v-model="case_input[index]" style="align:left" ></i-input>
+                    </ol>
+                </ul>
                 <!--<ul>
                     <ol v-for="(item,index) in case_apidata" >
 &lt;!&ndash;                        <div>请选择你的爱好(vue)</div>
@@ -244,43 +265,58 @@
                 columns.push({
                     title: 'ID',
                     key: 'case_id',
-                    sortable: true
+                    sortable: true,
+                    align: 'center',
                 })
 
                 columns.push({
                     title: '用例名称',
-                    key: 'case_name'
+                    key: 'case_name',
+                    align: 'center',
                 })
+                columns.push({
+                    title: '任务类型',
+                    key: 'type_id',
+                    align: 'center',
+                    render: (h, params) => {
+                        return  h('span',params.row.type_id === 1 ?'性能' : params.row.type_id === 2? '接口' : '未知')
+                    }
+                });
                 columns.push({
                     title: 'Action',
                     key: 'action',
+                    align: 'center',
                     render: (h, params) => {
                         return h('div', [
                             h('Button', {
                                 props: {
                                     type: 'primary',
-                                    size: 'small'
+                                    icon:"ios-create-outline",//编辑
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 style: {
-                                    marginRight: '5px'
+                                    marginRight: '5px',
                                 },
                                 on: {
                                     click: () => {
-                                        this.show(params.index)
+                                        this.show(params.row)
                                     }
                                 }
-                            }, 'View'),
+                            }, '编辑'),
                             h('Button', {
                                 props: {
                                     type: 'error',
-                                    size: 'small'
+                                    icon:"ios-trash-outline",//删除
+                                    shape:"circle",
+                                    size: 'buttonSize'
                                 },
                                 on: {
                                     click: () => {
                                         this.remove(params.index)
                                     }
                                 }
-                            }, 'Delete')
+                            }, '删除')
                         ])
                     }
                 })

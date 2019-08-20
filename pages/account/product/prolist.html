@@ -68,14 +68,8 @@
                 <Form-item label="产品描述" prop="description">
                     <i-input v-model="editForm.description" placeholder="请输入产品描述"></i-input>
                 </Form-item>
-                <!--                <Form-item label="文件上传" >
-                                    <i-input type="file" class="file"  @change="tirggerFile"/>
-                &lt;!&ndash;                    <Upload action="//jsonplaceholder.typicode.com/posts/" >
-                                        <i-Button icon="ios-cloud-upload-outline">Upload files</i-Button>
-                                    </Upload>&ndash;&gt;
-                                </Form-item>-->
                 <Form-item label="api_json" prop="api_json">
-                    <i-input v-model="editForm.api_json" placeholder="请输入接口字符串"></i-input>
+                    <i-Input v-model='editForm.api_json' type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入接口字符串"></i-Input>
                 </Form-item>
             </i-form>
 
@@ -88,11 +82,6 @@
             data: function () {
                 return {
                     editFormVisible:false,
-                    editFormRules: {
-                        name: [
-                            { required: true, message: '请输入姓名', trigger: 'blur' }
-                        ]
-                    },
                     editForm: {
                         pdt_id:'' ,
                         pdt_name: '',
@@ -104,7 +93,7 @@
                     },
                     modal1: false,
                     formValidate: {
-                        pdt_name: '123',
+                        pdt_name: '',
                         version: '',
                         host: '',
                         description: '',
@@ -127,15 +116,7 @@
                             { required: true, message: '产品接口字符串不能为空', trigger: 'blur' }
                         ]
                     },
-                  tableData3: [
-                      {
-                        'pdt_id': 12,
-                        'pdt_name': '集成平台1.0',
-                        'version': '集成平台1.0——V1.1.7.0_12&13',
-                        'host': '192.168.1.50:8888',
-                        'description': '这个是一个产品名称示例，请按照标准进行编写'
-                      }
-                    ],
+                  tableData3: [],
                   showBorder: false, // 显示边框
                   showStripe: true, // 是否显示斑马纹
                   showHeader: true, // 是否显示头部信息
@@ -145,6 +126,12 @@
                   tableSize: 'default'
                 }
             },
+            watch:{
+                //选择所属产品
+                editForm:function(){
+                    this.editForm.api_json=JSON.stringify(this.editForm.api_json)
+                }
+                },
           computed: {
             tableColumns3 () {
               let columns = []
@@ -165,6 +152,7 @@
               columns.push({
                 title: 'ID',
                 key: 'pdt_id',
+                  align: 'center',
                 sortable: true
               })
               console.log("length:"+this.tableData3.length)
@@ -180,6 +168,8 @@
               columns.push({
                 title: '产品名称',
                 key: 'pdt_name',
+                  align: 'center',
+                  sortable: true,
                 filters:filters_name1 ,
                 filterMethod (value, row) {
                   return row.pdt_name.indexOf(value) > -1
@@ -187,67 +177,59 @@
               })
               columns.push({
                 title: '产品版本',
-                key: 'version'
+                key: 'version',
+                  align: 'center',
+                  sortable: true,
               })
               columns.push({
                 title: '产品地址',
                 key: 'host',
+                  align: 'center',
                 sortable: true,
-                filters: [
-                  {
-                    "label": 'Greater than 25',
-                    "value": "1"
-                  },
-                  {
-                    "label": 'Less than 25',
-                    "value": "2"
-                  }
-                ],
-                filterMultiple: false,
-                filterMethod (value, row) {
-                  if (value === 1) {
-                    return row.age > 25
-                  } else if (value === 2) {
-                    return row.age < 25
-                  }
-                }
               })
               columns.push({
                 title: '产品描述',
-                key: 'description'
+                key: 'description',
+                  align: 'center',
+                  sortable: true,
               })
               columns.push({
-                title: 'Action',
+                title: '操作',
                 key: 'action',
-                render: (h, params) => {
-                  return h('div', [
-                    h('Button', {
-                      props: {
-                        type: 'primary',
-                        size: 'small'
-                      },
-                      style: {
-                        marginRight: '5px'
-                      },
-                      on: {
-                        click: () => {
-                          this.show(params.index)
-                        }
-                      }
-                    }, 'View'),
-                    h('Button', {
-                      props: {
-                        type: 'error',
-                        size: 'small'
-                      },
-                      on: {
-                        click: () => {
-                          this.remove(params.index)
-                        }
-                      }
-                    }, 'Delete')
-                  ])
-                }
+                  align: 'center',
+                  render: (h, params) => {
+                      return h('div', [
+                          h('Button', {
+                              props: {
+                                  type: 'primary',
+                                  icon:"ios-create-outline",//编辑
+                                  shape:"circle",
+                                  size: 'buttonSize'
+                              },
+                              style: {
+                                  marginRight: '5px',
+                              },
+                              on: {
+                                  click: () => {
+                                      this.show(params.index)
+                                  }
+                              }
+                          }, '编辑'),
+                          h('Button', {
+                              props: {
+                                  type: 'error',
+                                  icon:"ios-trash-outline",//删除
+                                  shape:"circle",
+                                  size: 'buttonSize'
+                              },
+                              on: {
+                                  click: () => {
+                                      this.remove(params.index)
+                                  }
+                              }
+                          }, '删除')
+                      ])
+                  }
               })
               console.log("columns"+JSON.stringify(columns))
               return columns

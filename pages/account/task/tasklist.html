@@ -325,7 +325,6 @@ task_typeID(val,oldval){
                                     type: 'error',
                                     icon:"ios-trash-outline",//删除
                                     shape:"circle",
-
                                     size: 'buttonSize'
                                 },
                                 on: {
@@ -405,10 +404,48 @@ task_typeID(val,oldval){
                 console.log("taskrun；" + JSON.stringify(event))
                 if (event.type_id === 1) {
                     console.log("run1；" + event.task_id)
+                    console.log("locust1:"+event.parameter)
                     axios.get('' + host + '/api/task-performance?order=1&task_id=' + event.task_id + '')
                         .then(res => {
-                            console.log(res)
-                            alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
+                            axios.gete(''+host+'/')
+                                .then(res=>{
+                                    //event.task_status=true;
+                                    console.log("locust2:"+JSON.stringify(locust))
+                                    console.log(res)
+                                    alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
+                                    var locust=event.parameter;
+                                    console.log("locust2:"+JSON.stringify(locust))
+                                    console.log("locust:"+event.parameter)
+                                    for( var i=0;i<locust.length;i++){
+                                        var str = locust[i].parameter;
+                                        var reg = RegExp(/=/);
+                                        var reg0 = RegExp(/--web-host/);
+                                        var reg1 = RegExp(/--web-port/);
+                                        var reg2 = RegExp(/--no-web/);
+                                        if (str.match(reg0)) {
+                                            arr = str.split("=");
+                                            var webhost = arr[1];
+                                        }
+                                        if (str.match(reg1)) {
+                                            arr = str.split("=");
+                                            var webport = arr[1];
+                                        }
+                                        if (str.match(reg2)) {
+                                            var noweb = true;
+                                        } else {
+                                            var noweb = false;
+                                        }
+                                    };
+                                    /*                            console.log("webhost" + webhost);
+                                                                console.log("webport:" + webport);
+                                                                console.log("webport2:" + noweb);*/
+                                    if (noweb == false) {
+                                        weburl = 'http://' + webhost + ':' + webport;
+                                        console.log("weburl:" + weburl);
+                                        window.open(weburl);
+
+                                    }
+                                })
                         })
                         .catch(function (error) {
                             (error)
@@ -416,18 +453,19 @@ task_typeID(val,oldval){
                 } else if (event.type_id === 2) {
                     this.loading=true;
                     console.log("cs2；" + JSON.stringify(event))
-/*                    axios.get('' + host + '/api/task-interface?task_id=' + event.task_id + '')
+                    axios.get('' + host + '/api/task-interface?task_id=' + event.task_id + '')
                         .then(res => {
                             console.log(res)
+                            this.loading=false;
                             alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
                         })
                         .catch(function (error) {
                             alert(error)
-                        });*/
-                axios.interceptors.request.use(config=>{
+                        });
+/*                axios.interceptors.request.use(config=>{
                     config.baseURL='' + host + '/api/task-interface?task_id=' + event.task_id + '',
                         config.tiemout=6000;
-                })
+                })*/
                 }
     },
             taskstop:function(index){
