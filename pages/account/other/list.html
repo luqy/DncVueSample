@@ -54,7 +54,7 @@
                         :on-success="handleSuccess"
                         :on-remove="handleRemove"
                         multiple
-                        action="http://192.168.1.56:8181/api/upload">
+                        action='http://192.168.1.21:8181//api/upload'>
                     <i-Button  icon="ios-cloud-upload-outline" >上传文件</i-Button>
 
 
@@ -84,7 +84,7 @@
                 },
 
                 ruleValidate: {
-                    pdt_name1: [
+     /*               pdt_name1: [
                         { required: true, message: '请选择产品', trigger: 'blur' }
                     ],
                     type: [
@@ -92,22 +92,23 @@
                     ],
                     fileupload: [
                         { required: true, message: '请选择文件', trigger: 'blur' }
-                    ]
+                    ]*/
                 }
             }
         },
 
-//   watch:{
-// 		  types(val,oldval){
-// 			 console.log("val:"+val) ;
-// 		}
-// },
+/*  watch:{
+		  types(val,oldval){
+			 console.log("val:"+val) ;
+		}
+},*/
         //获取产品列表
         created:function(){
             axios.get(''+host+'/api/product/getproductlist')
                 .then(res => {
                     console.log(res)
                     this.formValidate = res.data.message
+                    this.formValidate.url=''+host+'/api/upload'
                 })
                 .catch(function (error) {
                     console.log(error)
@@ -173,10 +174,8 @@
                     }else if(this.filename[i].name.includes('.xlsx') ){
                         file=this.filename[i].name
                         let obj={
-
                             "product_id":this.pdt_name,
                             "filename":this.filename[i].name
-
                         }
                         console.log("obj:"+JSON.stringify(obj))
                         axios({

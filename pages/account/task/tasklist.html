@@ -10,6 +10,8 @@
     <script src="../../../assets/iview/iview-3.1.0/iview.min.js"></script>
     <script src="../../../assets/axios/axios.js"></script>
     <script src="../../../js/config.js"></script>
+    <script src="../../../js/locust.js"></script>
+    <script src="../../../js/interface.js"></script>
 </head>
 
 <body>
@@ -33,13 +35,16 @@
                 </Radio-Group>
             </Form-item>
             <Form-item label="性能CASE列表"   v-if="task_typeID=== '1'">
-                <dl v-for="(item,index) in performance" :key="item">
+<!--                <dl v-for="(item,index) in performance" :key="item">
                     <label>
                         <input type="checkbox" v-model="case_token" :value="item">
                     </label>
                     {{item.case_name}}
 
-                </dl>
+                </dl>-->
+                <i-Table   @on-selection-change="handleSelectRow"  highlight-row :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                          :weight='800':height="fixedHeader ? 250 : ''"
+                          :size="tableSize" :data="performance" :columns="tableColumns" ref="selection"></i-Table>
             </Form-item>
             <Form-item label="接口CASE列表"   v-if="task_typeID=== '2'">
                 <dl v-for="(item,index) in interface" :key="index">
@@ -58,34 +63,39 @@
 
     <Modal
             v-model="editFormVisible"
-            title="编辑产品"
+            title="编辑任务"
             @on-ok="update"
             @on-cancel="cancel"
     >
         <i-form ref="editForm" :model="editForm" :rules="ruleValidate" :label-width="80">
-            <Form-item label="产品名称" prop="pdt_name">
-                <i-input v-model="editForm.pdt_name" placeholder="请输入产品名称"></i-input>
+            <Form-item label="任务名称" prop="task_name">
+                <i-input v-model="editForm.task_name" placeholder="请输入产品名称"></i-input>
             </Form-item>
-            <Form-item label="产品版本" prop="version">
-                <i-input v-model="editForm.version" placeholder="请输入产品版本号 "></i-input>
+            <Form-item label="任务列型" v-if="editForm.type_id===1">
+                <i-Input  value="性能"  readonly=true placeholder="Enter something..." />
             </Form-item>
-            <Form-item label="产品地址" prop="host">
-                <i-input v-model="editForm.host" placeholder="请输入产品地址"></i-input>
+            <Form-item label="任务列型" v-if="editForm.type_id===2">
+                <i-Input value="接口" readonly=true placeholder="Enter something..." />
             </Form-item>
-            <Form-item label="产品描述" prop="description">
-                <i-input v-model="editForm.description" placeholder="请输入产品描述"></i-input>
-            </Form-item>
-            <!--                <Form-item label="文件上传" >
-                                <i-input type="file" class="file"  @change="tirggerFile"/>
-            &lt;!&ndash;                    <Upload action="//jsonplaceholder.typicode.com/posts/" >
-                                    <i-Button icon="ios-cloud-upload-outline">Upload files</i-Button>
-                                </Upload>&ndash;&gt;
-                            </Form-item>-->
-            <Form-item label="api_json" prop="api_json">
-                <i-input v-model="editForm.api_json" placeholder="请输入接口字符串"></i-input>
-            </Form-item>
+            <form-item label="性能任务列表">
+    <!--             <dl v-for="(item,index) in this.editForm.per" :key="index">
+                <label >
+                 <input type="checkbox" v-model="case_token" :value="item">
+                </label>{{item.case_name}}
+                 </dl>-->
+                <i-Table  @on-selection-change="handleSelectRow"  highlight-row :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                          :weight='800':height="fixedHeader ? 250 : ''"
+                          :size="tableSize" :data="this.editForm.per" :columns="tableColumns" ref="selection"></i-Table>
+            </form-item>
         </i-form>
 
+    </Modal>
+    <Modal v-model="win" fullscreen title="任务参数"
+           @on-ok="addtaskwin"
+           @on-cancel="cancel"
+    >
+        <i-Table  @on-selection-change="handleSelectWin" :loading="loading" :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                 :height="fixedHeader ? 250 : ''" :size="tableSize" :data="taskwin" :columns="winColumns" ref="selection"></i-Table>
     </Modal>
 
 </div>
@@ -94,6 +104,9 @@
         el: "#app",
         data: function () {
             return {
+                win:false,
+                addtaskdata:'',
+                taskwin:[],
                 loading: false,
                 task_name:'',
                 checkedNames:[],
@@ -101,6 +114,7 @@
                 case_pdt:'',
                 case_apidata:'',
                 case_token:[],
+                selection:[],
                 case_input:[],
                 task_typeID:'',
                 casedate:[{
@@ -168,35 +182,6 @@
 
             }
         },
-        watch:{
-task_typeID(val,oldval){
-    var  performance0=[];
-    var  interface0=[];
-        console.log("val:"+val);
-        for(var i=0;i<this.case_pdt.length;i++){
-            if(this.case_pdt[i].type_id===1){
-                performance0.push({
-                    case_id:this.case_pdt[i].case_id,
-                    case_name:this.case_pdt[i].case_name,
-                })
-                //console.log("performance0:"+performance0)
-            }
-            else if(this.case_pdt[i].type_id===2){
-                interface0.push({
-                    case_id:this.case_pdt[i].case_id,
-                    case_name:this.case_pdt[i].case_name,
-                })
-                //console.log("interface0:"+interface0)
-
-            }
-        }
-    this.performance=performance0;
-    this.interface=interface0;
-/*    console.log("performance1:"+performance0)
-    console.log("interface1:"+interface0)
-    console.log("interfance2:"+JSON.stringify(this.interface))*/
-}
-        },
         computed: {
             tableColumns3: function () {
                 let columns = []
@@ -237,11 +222,12 @@ task_typeID(val,oldval){
                         return  h('span',params.row.type_id === 1 ?'性能' : params.row.type_id === 2? '接口' : '未知')
                     }
                 });
+
                 columns.push({
                     title: '运行参数',
                     key: 'parameter',
                     tooltip:true,
-                    width:500,
+                    width:300,
                 });
                 columns.push({
                     title: '任务执行',
@@ -296,6 +282,21 @@ task_typeID(val,oldval){
                                     }
                                 }
                             }, ),
+                            h('Button', {
+                                props: {
+                                    icon:"md-cog",//编辑参数
+
+                                    size: 'buttonSize'
+                                },
+                                style: {
+                                    marginRight: '5px',
+                                },
+                                on: {
+                                    click: () => {
+                                        this.taskupdate(params.row);
+                                    }
+                                }
+                            }, ),
                         ])
                     }
                 })
@@ -316,7 +317,7 @@ task_typeID(val,oldval){
                                 },
                                 on: {
                                     click: () => {
-                                        this.show(params.index)
+                                        this.show(params.row)
                                     }
                                 }
                             },'编辑'),
@@ -338,10 +339,130 @@ task_typeID(val,oldval){
                 })
                 console.log("columns" + JSON.stringify(columns))
                 return columns
-            }
+            },
+            tableColumns:function(){
+                let columns = []
+                if (this.showCheckbox) {
+                    columns.push({
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    })
+                }
+                if (this.showIndex) {
+                    columns.push({
+                        type: 'index',
+                        width: 60,
+                        align: 'center'
+                    })
+                }
+                columns.push({
+                    title: '任务名称',
+                    key: 'case_name',
+
+
+                })
+                return columns
+            },
+            winColumns:function(){
+                let columns = []
+                if (this.showCheckbox) {
+                    columns.push({
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    })
+                }
+                if (this.showIndex) {
+                    columns.push({
+                        type: 'index',
+                        width: 60,
+                        align: 'center'
+                    })
+                }
+                columns.push({
+                    title: '参数名称',
+                    key: 'parameter',
+                })
+                columns.push({
+                    title: '参数值',
+                    key: 'winvalue',
+                    render: (h, params) => {
+                        return h('div', [
+                            h('Input', {
+                                props: {
+                                    shape:"circle",
+                                    size: 'buttonSize',
+                                    value:this.taskwin[params.index].winvalue,
+                                    readonly:this.taskwin[params.index].status
+                                    //display:true
+                                    //type:'textarea',
+                                    //autosize:{minRows:1,maxRows:3},
+
+
+
+                                },
+                                style: {
+                                    marginRight: '5px',
+                                },
+                                on: {
+                                    'on-change': (event) => {
+                                        console.log('a：'+JSON.stringify(event))
+                                        console.log('b：'+JSON.stringify(params.row))
+                                        console.log('c：'+params.row.action)
+                                        console.log('d：'+params.index)
+                                        this.$refs.selection.objData[params.index]._isChecked=false;
+                                        this.$refs.selection.toggleSelect(params.index)
+                                        this.taskwin[params.index].value=event.target.value;
+                                        console.log("fan："+JSON.stringify(this.taskwin[params.index]));
+
+                                    }
+                                }
+                            })
+                        ])
+                    }
+                })
+                columns.push({
+                    title: '参数说明',
+                    key: 'description',
+                })
+                return columns
+            },
         },
+        watch:{
+task_typeID(val,oldval){
+    var  performance0=[];
+    var  interface0=[];
+        console.log("val:"+val);
+    console.log("shouw3"+JSON.stringify(this.case_pdt))
+        for(var i=0;i<this.case_pdt.length;i++){
+            if(this.case_pdt[i].type_id===1){
+                performance0.push({
+                    case_id:this.case_pdt[i].case_id,
+                    case_name:this.case_pdt[i].case_name,
+                })
+                //console.log("performance0:"+performance0)
+            }
+            else if(this.case_pdt[i].type_id===2){
+                interface0.push({
+                    case_id:this.case_pdt[i].case_id,
+                    case_name:this.case_pdt[i].case_name,
+                })
+                //console.log("interface0:"+interface0)
+
+            }
+        }
+    this.performance=performance0;
+    this.interface=interface0;
+/*    console.log("performance1:"+performance0)
+    console.log("interface1:"+interface0)
+    console.log("interfance2:"+JSON.stringify(this.interface))*/
+}
+        },
+
         created:function(){
             axios.get(''+host+'/api/taskinfo/taskmagager')
+            //axios.get(''+host+'/api/taskinfo/tasklist')
                 .then(res => {
                     console.log(res)
                     /*this.tableData3 = res.data.message*/
@@ -354,11 +475,6 @@ task_typeID(val,oldval){
                             this.case_pdt = res.data.message
                             console.log("task4:"+this.tableData3.length)
                             console.log(this.case_pdt)
-                            for(var i=0;i<this.tableData3.length;i++){
-
-                            }
-
-
                         })
                         .catch(function (error) {
                             console.log(error)
@@ -373,7 +489,22 @@ task_typeID(val,oldval){
         mounted:function(){
             console.log("task:"+this.tableData3.length)
         },
-        methods:{
+        methods:{//列表点击
+            handleSelectRow:function(selection,row) {
+
+                //console.log('11:'+JSON.stringify(this.$refs.selection.getslection()));
+                /* console.log('1:'+this.tableData[0].action);*/
+                // console.log('11:'+selection.selectionIndexes);
+                console.log('21:'+JSON.stringify(row));
+                console.log('31:'+JSON.stringify(selection));
+                //console.log('32:'+index);
+                this.selection=selection;
+                //console.log("fan："+JSON.stringify(this.case_apidata[params.index]));
+            },
+            handleSelectWin:function(selection,row){
+                console.log('中间selection:'+JSON.stringify(selection));
+                this.selection=selection;
+            },
             //脚本生成
             addsript:function(event) {
                 console.log("cs；" + JSON.stringify(event))
@@ -407,10 +538,10 @@ task_typeID(val,oldval){
                     console.log("locust1:"+event.parameter)
                     axios.get('' + host + '/api/task-performance?order=1&task_id=' + event.task_id + '')
                         .then(res => {
-                            axios.gete(''+host+'/')
+                            axios.gete('' + host + '/api/taskinfo/task?tid=' + event.task_id + '')
                                 .then(res=>{
                                     //event.task_status=true;
-                                    console.log("locust2:"+JSON.stringify(locust))
+                                    console.log("locust2:"+JSON.stringify(res.data.message.locust_cl))
                                     console.log(res)
                                     alert("操作:" + res.data.title + ",\n结果:" + res.data.message)
                                     var locust=event.parameter;
@@ -471,16 +602,351 @@ task_typeID(val,oldval){
             taskstop:function(index){
 
             },
+            //编辑任务参数
+            taskupdate:function(row){
+                this.win=true;
+
+/*
+                this.taskwin=locust
+                for (i = 0; i < locust.length; i++) {
+                    var str = locust[i].parameter;
+                    var reg = RegExp(/=/);
+                    arr = str.split("=");
+                    arr1 = str.split("=");
+                    console.log("数据对象1：" + arr[0]);
+                    console.log("数据对象2：" + arr[1]);
+                    if (str.match(reg)) {
+                        this.taskwin[i].winvalue=arr[1]
+                        this.taskwin[i].status=false,
+                            this.taskwin[i].arr=arr[0]
+                    }
+                    else{
+                        this.taskwin[i].winvalue='只需勾选,只读'
+                        this.taskwin[i].status=true
+                    }
+                }*/
+                //console.log("winvalue0:"+JSON.stringify(this.taskwin))
+                axios.get('' + host + '/api/taskinfo/task?tid=' +row.task_id + '')
+                    .then(res => {
+                        let winvalue1=res.data
+                        this.addtaskdata=res;
+                        console.log("winvalue1:"+JSON.stringify(res))
+                        if(row.type_id===1){
+                            if(res.data.message.locust_cl.length>0){
+                                for(var i=0;i<locust.length;i++){
+                                    var str = locust[i].parameter;
+                                    var reg = RegExp(/=/);
+                                    arr = str.split("=");
+                                    var arr1='';
+                                    var reg1 = RegExp(/=/);
+                                    for(var j=0;j<res.data.message.locust_cl.length;j++){
+                                        if (res.data.message.locust_cl[j].parameter.match(reg1)) {
+                                            //console.log("数据对象：" + res.data.message.locust_cl[i].parameter);
+                                            arr1 = res.data.message.locust_cl[j].parameter.split("=");
+                                        }
+                                       // console.log("数据对象1：" + arr1[0]);
+                                        //console.log("数据对象2：" + arr1[1]);
+                                       // console.log("数据对象3：" + arr[0]);
+                                        if (arr1[0] === arr[0]) {
+                                            //console.log("j___"+j)
+                                            //console.log("数据对象5：" + arr1[1]);
+                                            locust[i].winvalue=arr1[1]
+                                            locust[i]._checked=true;
+                                            //console.log("s："+JSON.stringify(this.taskwin))
+                                        }else if (res.data.message.locust_cl[j].parameter=== locust[i].parameter) {
+                                           // console.log("j1___"+j)
+                                            locust[i]._checked=true;
+                                        }
+
+                                    }
+
+                                     this.taskwin=locust;
+                                    //console.log("zong000"+JSON.stringify(locust[i].winvalue))
+                                    //console.log("zong"+JSON.stringify(this.taskwin[i].winvalue))
+                                    var str0=this.taskwin[i].parameter
+                                    arr0 = str0.split("=");
+                                    if (str0.match(reg)) {
+                                        if(this.taskwin[i].winvalue===undefined){
+                                            this.taskwin[i].winvalue=arr0[1]
+                                        }else{this.taskwin[i].winvalue=this.taskwin[i].winvalue}
+                                        this.taskwin[i].status=false
+                                    }
+                                    else {
+                                        this.taskwin[i].winvalue='只需勾选,只读'
+                                        this.taskwin[i].status=true
+                                    }
+                                   //console.log("zong"+JSON.stringify(this.taskwin))
+
+                                }
+                            }
+/*
+                       var str = locust[i].parameter;
+                                    var reg = RegExp(/=/);
+                                    arr = str.split("=");
+                                    arr1 = str.split("=");
+                                    console.log("数据对象1：" + arr[0]);
+                                    console.log("数据对象2：" + arr[1]);
+                                    if (str.match(reg)) {
+                                        this.taskwin[i].winvalue=arr[1]
+                                        this.taskwin[i].status=false,
+                                            this.taskwin[i].arr=arr[0]
+                                    }
+                                    else {
+                                        this.taskwin[i].winvalue='只需勾选,只读'
+                                        this.taskwin[i].status=true
+                                    }
+                            var reg1 = RegExp(/=/);
+                            //console.log("winvalue12:"+h)
+                            if(res.data.message.locust_cl.length>0){
+                                console.log("winvalue13:"+res.data.message.locust_cl.length)
+                                /!*              if (res.data.message.locust_cl[0].parameter.match(reg1)) {
+                                                  console.log("数据对象：" + res.data.message.locust_cl[0].parameter);
+                                                  arr1 = res.data.message.locust_cl[0].parameter.split("=");
+                                                  console.log("数据对象1：" + arr1[0]);
+                                                  console.log("数据对象2：" + arr1[1]);
+                                                  this.taskwin[i].winvalue=arr1[1]
+                                              }*!/
+
+                                for(var i=0;i<res.data.message.locust_cl.length;i++) {
+                                    console.log("I1___"+i)
+                                    if (res.data.message.locust_cl[i].parameter.match(reg1)) {
+                                        //console.log("数据对象：" + res.data.message.locust_cl[i].parameter);
+                                        arr1 = res.data.message.locust_cl[i].parameter.split("=");
+                                        //console.log("数据对象1：" + arr1[0]);
+                                        //console.log("数据对象2：" + arr1[1]);
+                                        //console.log("数据对象3：" + arr[0]);
+                                    }
+                                    this.taskwin=locust
+                                        for(var j=0;j<locust.length;j++){
+                                            var str = locust[j].parameter;
+                                            var reg = RegExp(/=/);
+                                            arr = str.split("=");
+                                            arr1 = str.split("=");
+                                            console.log("数据对象1：" + arr[0]);
+                                            console.log("数据对象2：" + arr[1]);
+                                            if (str.match(reg)) {
+                                                this.taskwin[j].winvalue=arr[1]
+                                                this.taskwin[j].status=false,
+                                                    this.taskwin[j].arr=arr[0]
+                                            }
+                                            else {
+                                                this.taskwin[j].winvalue='只需勾选,只读'
+                                                this.taskwin[j].status=true
+                                            }
+                                            //console.log("数据对象4：" + this.taskwin.length);
+                                            //console.log("数据对象5：" + this.taskwin[j].arr);
+                                            if (arr1[0] === arr[0]) {
+                                                console.log("j___"+j)
+                                                console.log("数据对象5：" + arr1[1]);
+                                                this.taskwin[j].winvalue=arr1[1]
+                                                this.taskwin[j]._checked=true;
+                                                console.log("s："+JSON.stringify(this.taskwin))
+                                            }else if (this.taskwin[j].parameter=== arr1[0]) {
+                                                console.log("j1___"+j)
+                                                this.taskwin[j]._checked=true;
+                                            }
+
+                                        }
+
+
+                                }
+                            console.log("zong："+JSON.stringify(this.taskwin))
+                            }
+*/
+
+                        }
+                        else if(row.type_id===2){
+                            if(res.data.message.pytest_para.length>0){
+                                for(var i=0;i<interface.length;i++){
+                                    var str = interface[i].parameter;
+                                    var reg = RegExp(/=/);
+                                    arr = str.split("=");
+                                    var arr1='';
+                                    var reg1 = RegExp(/=/);
+                                    for(var j=0;j<res.data.message.pytest_para.length;j++){
+                                        if (res.data.message.pytest_para[j].parameter.match(reg1)) {
+                                            console.log("数据对象：" + res.data.message.pytest_para[j].parameter);
+                                            arr1 = res.data.message.pytest_para[j].parameter.split("=");
+                                        }
+                                         //console.log("数据对象1：" + arr1[0]);
+                                       // console.log("数据对象2：" + arr1[1]);
+                                         //console.log("数据对象3：" + arr[0]);
+                                        if (arr1[0] === arr[0]) {
+                                            console.log("j___"+j+'--'+i)
+                                            //console.log("数据对象5：" + arr1[1]);
+                                            interface[i].winvalue=arr1[1]
+                                            interface[i]._checked=true;
+                                            //console.log("s："+JSON.stringify(this.taskwin))
+                                        }else if (res.data.message.pytest_para[j].parameter=== interface[i].parameter) {
+                                             console.log("j1___"+j)
+                                            interface[i]._checked=true;
+                                        }
+
+                                    }
+
+                                    this.taskwin=interface;
+                                    console.log("zong000"+JSON.stringify(interface))
+                                    //console.log("zong"+JSON.stringify(this.taskwin))
+                                    var str0=this.taskwin[i].parameter
+                                    arr0 = str0.split("=");
+                                    if (str0.match(reg)) {
+                                        if(this.taskwin[i].winvalue===undefined){
+                                            this.taskwin[i].winvalue=arr0[1]
+                                        }else{this.taskwin[i].winvalue=this.taskwin[i].winvalue}
+                                        this.taskwin[i].status=false
+                                    }
+                                    else {
+                                        this.taskwin[i].winvalue='只需勾选,只读'
+                                        this.taskwin[i].status=true
+                                    }
+                                    console.log("zong"+JSON.stringify(this.taskwin))
+
+                                }
+                            }
+                            /*
+                                                   var str = locust[i].parameter;
+                                                                var reg = RegExp(/=/);
+                                                                arr = str.split("=");
+                                                                arr1 = str.split("=");
+                                                                console.log("数据对象1：" + arr[0]);
+                                                                console.log("数据对象2：" + arr[1]);
+                                                                if (str.match(reg)) {
+                                                                    this.taskwin[i].winvalue=arr[1]
+                                                                    this.taskwin[i].status=false,
+                                                                        this.taskwin[i].arr=arr[0]
+                                                                }
+                                                                else {
+                                                                    this.taskwin[i].winvalue='只需勾选,只读'
+                                                                    this.taskwin[i].status=true
+                                                                }
+                                                        var reg1 = RegExp(/=/);
+                                                        //console.log("winvalue12:"+h)
+                                                        if(res.data.message.locust_cl.length>0){
+                                                            console.log("winvalue13:"+res.data.message.locust_cl.length)
+                                                            /!*              if (res.data.message.locust_cl[0].parameter.match(reg1)) {
+                                                                              console.log("数据对象：" + res.data.message.locust_cl[0].parameter);
+                                                                              arr1 = res.data.message.locust_cl[0].parameter.split("=");
+                                                                              console.log("数据对象1：" + arr1[0]);
+                                                                              console.log("数据对象2：" + arr1[1]);
+                                                                              this.taskwin[i].winvalue=arr1[1]
+                                                                          }*!/
+
+                                                            for(var i=0;i<res.data.message.locust_cl.length;i++) {
+                                                                console.log("I1___"+i)
+                                                                if (res.data.message.locust_cl[i].parameter.match(reg1)) {
+                                                                    //console.log("数据对象：" + res.data.message.locust_cl[i].parameter);
+                                                                    arr1 = res.data.message.locust_cl[i].parameter.split("=");
+                                                                    //console.log("数据对象1：" + arr1[0]);
+                                                                    //console.log("数据对象2：" + arr1[1]);
+                                                                    //console.log("数据对象3：" + arr[0]);
+                                                                }
+                                                                this.taskwin=locust
+                                                                    for(var j=0;j<locust.length;j++){
+                                                                        var str = locust[j].parameter;
+                                                                        var reg = RegExp(/=/);
+                                                                        arr = str.split("=");
+                                                                        arr1 = str.split("=");
+                                                                        console.log("数据对象1：" + arr[0]);
+                                                                        console.log("数据对象2：" + arr[1]);
+                                                                        if (str.match(reg)) {
+                                                                            this.taskwin[j].winvalue=arr[1]
+                                                                            this.taskwin[j].status=false,
+                                                                                this.taskwin[j].arr=arr[0]
+                                                                        }
+                                                                        else {
+                                                                            this.taskwin[j].winvalue='只需勾选,只读'
+                                                                            this.taskwin[j].status=true
+                                                                        }
+                                                                        //console.log("数据对象4：" + this.taskwin.length);
+                                                                        //console.log("数据对象5：" + this.taskwin[j].arr);
+                                                                        if (arr1[0] === arr[0]) {
+                                                                            console.log("j___"+j)
+                                                                            console.log("数据对象5：" + arr1[1]);
+                                                                            this.taskwin[j].winvalue=arr1[1]
+                                                                            this.taskwin[j]._checked=true;
+                                                                            console.log("s："+JSON.stringify(this.taskwin))
+                                                                        }else if (this.taskwin[j].parameter=== arr1[0]) {
+                                                                            console.log("j1___"+j)
+                                                                            this.taskwin[j]._checked=true;
+                                                                        }
+
+                                                                    }
+
+
+                                                            }
+                                                        console.log("zong："+JSON.stringify(this.taskwin))
+                                                        }
+                            */
+
+                        }
+                        /*else if(row.type_id===2){
+                            console.log("接口"+JSON.stringify(res))
+                            console.log("接口"+JSON.stringify(res.data.message.pytest_para))
+                            if(res.data.message.locust_cl.length>0){
+                                for(var i=0;i<locust.length;i++){
+                                    var str = locust[i].parameter;
+                                    var reg = RegExp(/=/);
+                                    arr = str.split("=");
+                                    arr1 = str.split("=");
+                                    var reg1 = RegExp(/=/);
+                                    for(var j=0;j<res.data.message.locust_cl.length;j++){
+                                        if (res.data.message.locust_cl[j].parameter.match(reg1)) {
+                                            //console.log("数据对象：" + res.data.message.locust_cl[i].parameter);
+                                            arr1 = res.data.message.locust_cl[j].parameter.split("=");
+                                        }
+                                        // console.log("数据对象1：" + arr1[0]);
+                                        console.log("数据对象2：" + arr1[1]);
+                                        // console.log("数据对象3：" + arr[0]);
+                                        if (arr1[0] === arr[0]) {
+                                            console.log("j___"+j)
+                                            console.log("数据对象5：" + arr1[1]);
+                                            locust[i].winvalue=arr1[1]
+                                            locust[i]._checked=true;
+                                            //console.log("s："+JSON.stringify(this.taskwin))
+                                        }else if (res.data.message.locust_cl[j].parameter=== locust[i].parameter) {
+                                            console.log("j1___"+j)
+                                            locust[i]._checked=true;
+                                        }
+
+                                    }
+
+                                    this.taskwin=locust;
+                                    console.log("zong000"+JSON.stringify(locust[i].winvalue))
+                                    console.log("zong"+JSON.stringify(this.taskwin[i].winvalue))
+                                    var str0=this.taskwin[i].parameter
+                                    arr0 = str0.split("=");
+
+                                    if (str0.match(reg)) {
+                                        if(this.taskwin[i].winvalue===undefined){
+                                            this.taskwin[i].winvalue=arr0[1]
+                                        }else{this.taskwin[i].winvalue=this.taskwin[i].winvalue}
+                                        this.taskwin[i].status=false
+                                    }
+                                    else {
+                                        this.taskwin[i].winvalue='只需勾选,只读'
+                                        this.taskwin[i].status=true
+                                    }
+                                    //console.log("zong"+JSON.stringify(this.taskwin))
+
+                                }
+                            }
+                        }*/
+                    });
+
+
+
+            },
             //删除按钮
             remove: function (index) {
-                console.log('date1' + this.tableData3[index].pdt_id)
+
                 // 格局id删除数据
-                var obj = {pdt_id: this.tableData3[index].pdt_id}
+                var obj = {task_id:this.tableData3[index].task_id}
+                console.log('date1' + JSON.stringify(obj))
                 this.tableData3.splice(index, 1)
                 // var url = '/api/product/delproduct'
                 // 发送异步请求
                 axios({
-                    url: ''+host+'/api/product/delproduct',
+                    url: ''+host+'/api/taskinfo/task',
                     method: 'delete',
                     dataType: 'json',
                     headers: {
@@ -491,22 +957,130 @@ task_typeID(val,oldval){
                     if (res.status === 200) {
                         alert('success')
                         // 更新数据
-                        console.log(res.message)
+                        console.log(res)
                         this.tableData3.splice(index, 1)
                     } else {
-                        alert(res.message)
+                        alert(res)
                     }
                 }).catch(function () {
                     alert('服务连接出错了')
                 })
             },
             //点击编辑
-            show (index) {
+            show (row) {
                 this.editFormVisible=true;
-                console.log("shouw"+JSON.stringify(this.tableData3[index]))
-                this.editForm=this.tableData3[index];
+                console.log("row"+JSON.stringify(row))
+
+                this.editForm=row;
                 //this.editForm.api_json=JSON.parse(this.editForm.api_json)
-                console.log("shouw1"+JSON.stringify(this.editForm))
+                console.log("case_pdt"+JSON.stringify(this.case_pdt))
+                var  performance0=[];
+                var  interface0=[];
+
+                for(var i=0;i<this.case_pdt.length;i++){
+                    this.case_pdt[i]._checked=false;
+                    if(this.case_pdt[i].type_id===1){
+                        for(var j=0;j<this.editForm.associated_case.length;j++){
+                            if(this.case_pdt[i].case_id===this.editForm.associated_case[j].case_id){
+                                this.case_pdt[i]._checked="checked";
+                            }
+                        }
+                        performance0.push({
+                            case_id:this.case_pdt[i].case_id,
+                            case_name:this.case_pdt[i].case_name,
+                            _checked:this.case_pdt[i]._checked
+
+                        })
+                    }
+                    else if(this.case_pdt[i].type_id===2){
+                        for(var j=0;j<this.editForm.associated_case.length;j++){
+                            if(this.case_pdt[i].case_id===this.editForm.associated_case[j].case_id){
+                                this.case_pdt[i]._checked="checked";
+                            }
+                        }
+                        interface0.push({
+                            case_id:this.case_pdt[i].case_id,
+                            case_name:this.case_pdt[i].case_name,
+                            _checked:this.case_pdt[i]._checked
+                        })
+                    }
+/*                    if(this.case_pdt[i].type_id===1){
+                        for(var j=0;j<this.editForm.associated_case.length;j++){
+                            if(this.case_pdt[i].case_id===this.editForm.associated_case[j].case_id){
+                                this.editForm.associated_case[j]._checked=true;
+                            }
+                        }
+                    }
+                    console.log("this"+JSON.stringify(this.editForm))*/
+/*                    else if(this.case_pdt[i].type_id===2){
+                        for(var j=0;j<this.editForm.associated_case.length;j++){
+                            if(this.case_pdt[i].case_id===this.editForm.associated_case[j].case_id){
+                                this.editForm.associated_case[j]._checked=true;
+                            }else{this.editForm.associated_case[j]._checked=false;}
+                        }
+                    }*/
+
+/*                    console.log("h--"+i+JSON.stringify(this.case_pdt[i].type_id))
+                    console.log("h1--"+i+JSON.stringify(this.editForm.associated_case))
+                    for(var j=0;j<this.editForm.associated_case.length;j++){
+                        console.log("hello1"+JSON.stringify(this.case_pdt[i].type_id))
+                        if(this.case_pdt[i].type_id===1){
+                            console.log("hello2"+JSON.stringify(this.editForm.associated_case[j]))
+                            if(this.case_pdt[i].case_id===this.editForm.associated_case[j].case_id){
+                                console.log("cs ")
+                                performance0.push({
+                                    case_id:this.case_pdt[i].case_id,
+                                    case_name:this.case_pdt[i].case_name,
+                                    _checked:true,
+                                    _isChecked:true
+                                })
+                            }else{
+                                performance0.push({
+                                    case_id:this.case_pdt[i].case_id,
+                                    case_name:this.case_pdt[i].case_name,
+                                    _checked:false,
+                                    _isChecked:false
+                                })
+                            }
+
+                            //console.log("performance0:"+performance0)
+                        }
+                        else if(this.case_pdt[i].type_id===2){
+                            if(this.case_pdt[i].case_id===this.editForm.associated_case[j].case_id){
+                                interface0.push({
+                                    case_id:this.case_pdt[i].case_id,
+                                    case_name:this.case_pdt[i].case_name,
+                                    _checked:true,
+                                    _isChecked:true
+                                })
+                            }else{
+                                interface0.push({
+                                    case_id:this.case_pdt[i].case_id,
+                                    case_name:this.case_pdt[i].case_name,
+                                    _checked:false,
+                                    _isChecked:false
+                                })
+                            }
+          /!*                  interface0.push({
+                                case_id:this.case_pdt[i].case_id,
+                                case_name:this.case_pdt[i].case_name,
+
+                            })*!/
+
+
+                        }
+                    }*/
+                }
+                console.log("interface0:"+JSON.stringify(interface0))
+                console.log("interface1:"+JSON.stringify(performance0))
+                if(this.editForm.type_id===1){
+                    this.editForm.per=performance0;
+                    this.editForm.per[0].checked="checked";
+                }else if(this.editForm.type_id===2){
+                    this.editForm.per=interface0;
+                }
+                console.log("editForm"+JSON.stringify(this.editForm))
+                /*this.$options.watch.task_typeID(this.editForm.type_id)*/
                 /*                  this.$Modal.confirm({
                                       title: '编辑产品',
                                       fullscreen:true,
@@ -550,12 +1124,16 @@ task_typeID(val,oldval){
                 //let api_json = JSON.parse(this.case_api )
                 //this.formValidate.api_json=api_json
                 console.log("task_list:"+JSON.stringify(this.case_token));
+                console.log("slection:"+JSON.stringify(this.selection));
                 console.log("task_name:"+JSON.stringify(this.task_name));
                 console.log("task_typeID:"+JSON.stringify(this.task_typeID));
+/*                var parameter='--web-host='+host.substring(7,)+''
+                console.log("parameter:"+parameter)*/
                 if(this.task_typeID==='1'){
+
                     var obj={
                         "task_name":this.task_name,
-                        "associated_case":this.case_token,
+                        "associated_case":this.selection,
                         "task_status": false,
                         "locust_cl": [
                             {
@@ -564,7 +1142,7 @@ task_typeID(val,oldval){
                             },
                             {
                                 "need": 1,
-                                "parameter": "--web-host=192.168.1.21"
+                                "parameter": '--web-host='+host.substring(7,)+''
                             },
                             {
                                 "need": 1,
@@ -575,16 +1153,20 @@ task_typeID(val,oldval){
                 }else if(this.task_typeID==='2'){
                     var obj={
                         "task_name":this.task_name,
-                        "associated_case":[],
+                        "associated_case":this.case_token,
                         "task_status": false,
                         "locust_cl":[],
-                        "pytest_para":this.case_token
+                        "pytest_para":    [{
+                            "parameter": "--disable-warnings",
+                            "description": "禁用警告"
+                        }
+                ]
                     }
                 }
 
                 console.log("api_id10:"+JSON.stringify(obj))
                 axios({
-                    //url: ''+host+'/api/caseinfo/case',
+                    url: ''+host+'/api/taskinfo/task',
                     method: 'post',
                     dataType: 'json',
                     headers: {
@@ -594,7 +1176,7 @@ task_typeID(val,oldval){
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                    //location.reload()
+                    setTimeout('location.reload()',200);
 
                 })
                     .catch(function(error){
@@ -603,18 +1185,139 @@ task_typeID(val,oldval){
                     })
 
             },
-            //编辑
+            //编辑更新
             update() {
-                console.log("修改:"+JSON.stringify(this.editForm));
-                this.editForm.api_json=JSON.parse(this.editForm.api_json)
+                console.log("修改1:"+JSON.stringify(this.editForm));
+                console.log("修改a:"+JSON.stringify(this.selection));
+                if(this.selection===undefined){
+                    this.selection=this.editForm.associated_case
+                }
+                axios.get('' + host + '/api/taskinfo/task?tid=' +this.editForm.task_id + '')
+                    .then(res => {
+console.log(res)
+                        obj={
+                            "task_id": this.editForm.task_id,
+                            "task_name": this.editForm.task_name,
+                            "associated_case":this.selection,
+                            "task_status": res.data.message.task_status,
+                            "locust_cl":res.data.message.locust_cl,
+                            "pytest_para":res.data.message.pytest_para
+                        }
+                        console.log("ss:"+JSON.stringify(obj))
+                        axios({
+                            url: ''+host+'/api/taskinfo/task',
+                            method: 'put',
+                            dataType: 'json',
+                            headers: {
+                                'Content-type': 'application/json;'
+                            },
+                            data: JSON.stringify(obj),
+                        }).then(function (response){
+                            console.log(response)
+                            alert("操作:"+response.data.title+",\n结果:"+response.data.message)
+                            location.reload()
+
+                        })
+                            .catch(function(error){
+                                console.log(error)
+                            })
+                    })
+
+            },
+            //任务参数编辑更新
+            addtaskwin(){
+
+                //alert("确定")
+                //console.log("this.selection"+JSON.stringify(this.selection))
+                console.log("this.taskwin"+JSON.stringify(this.addtaskdata.data))
+                var obj1=[];
+/*                for(var i=0;i<this.taskwin.length;i++){
+                    if(this.selection.length!=0){
+                        for(var i=0;i<this.selection.length;i++){
+                            if(this.selection[i].status===false){
+                                console.log("value"+this.selection[i].parameter.split("=")[0])
+                                var obj0={
+                                    "need":1,
+                                    "parameter":this.selection[i].parameter.split("=")[0]+'='+this.selection[i].value,
+                                }
+                                obj1.push(obj0)
+                            }else if(this.selection[i].status===true){
+                                var obj0={
+                                    "need":1,
+                                    "parameter":this.selection[i].parameter
+                                }
+                                obj1.push(obj0)
+                            }
+                        }
+                        console.log("ojb总的："+JSON.stringify(obj1))
+                    }else{
+                        this.selection=this.addtaskdata.data.message.locust_cl
+                    }
+                }*/
+                  if(this.selection.length!=0){
+                      for(var i=0;i<this.taskwin.length;i++){
+                          for(var j=0;j<this.selection.length;j++){
+                              if(this.taskwin[i].parameter===this.selection[j].parameter){
+                                  console.log("this.taskwin.value"+this.taskwin[i].value)
+                                  if(this.taskwin[i].status===false&&this.taskwin[i].value!=undefined){
+                                      console.log("value"+this.taskwin[i].parameter.split("=")[1])
+                                      var obj0={
+                                          "need":1,
+                                          "parameter":this.taskwin[i].parameter.split("=")[0]+'='+this.taskwin[i].value,
+                                      }
+                                      obj1.push(obj0)
+                                  }else if (this.taskwin[i].status===false&&this.taskwin[i].value===undefined){
+                                      var obj0={
+                                          "need":1,
+                                          "parameter":this.taskwin[i].parameter.split("=")[0]+'='+this.taskwin[i].winvalue,
+                                      }
+                                      obj1.push(obj0)
+                                  }
+                                  else if(this.taskwin[i].status===true){
+                                      var obj0={
+                                          "need":1,
+                                          "parameter":this.taskwin[i].parameter
+                                      }
+                                      obj1.push(obj0)
+                                  }
+                              }
+                          }
+                      }
+                  }
+                  else{
+                      obj1=this.addtaskdata.data.message.locust_cl
+                  }
+                    console.log("this.obj1"+JSON.stringify(obj1))
+                if(this.addtaskdata.data.message.locust_cl.length!=0){
+                    obj={
+                        "task_id": this.addtaskdata.data.message.task_id,
+                        "task_name": this.addtaskdata.data.message.task_name,
+                        "associated_case":this.addtaskdata.data.message.associated_case,
+                        "task_status": this.addtaskdata.data.message.task_status,
+                        "locust_cl":obj1,
+                        "pytest_para":this.addtaskdata.data.message.pytest_para
+                    }
+                }
+                  else if (this.addtaskdata.data.message.pytest_para.length!=0){
+                    obj={
+                        "task_id": this.addtaskdata.data.message.task_id,
+                        "task_name": this.addtaskdata.data.message.task_name,
+                        "associated_case":this.addtaskdata.data.message.associated_case,
+                        "task_status": this.addtaskdata.data.message.task_status,
+                        "locust_cl":this.addtaskdata.data.message.locust_cl,
+                        "pytest_para":obj1
+                    }
+                }
+
+                console.log("ss:"+JSON.stringify(obj))
                 axios({
-                    url: ''+host+'/api/product/updateproduct',
+                    url: ''+host+'/api/taskinfo/task',
                     method: 'put',
                     dataType: 'json',
                     headers: {
                         'Content-type': 'application/json;'
                     },
-                    data: JSON.stringify(this.editForm),
+                    data: JSON.stringify(obj),
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
@@ -624,18 +1327,18 @@ task_typeID(val,oldval){
                     .catch(function(error){
                         console.log(error)
                     })
-
             },
             cancel () {
-                this.$Message.info('已取消');
+/*                this.$Message.info('已取消');
                 this.formValidate = {
                     pdt_name: '123',
                     version: '',
                     host: '',
                     description: '',
                     api_json: ''
-                };
-                //location.reload()
+                };*/
+                this.$Message.info('已取消');
+                setTimeout('location.reload()',500);
             },
 
         }

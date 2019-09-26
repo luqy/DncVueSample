@@ -32,13 +32,35 @@
                 </i-Select>
             </Form-item>
             <Form-item label="类型" prop="host">
-                <Radio-Group v-model="casedate.type_id" >
-                    <Radio label="1">性能</Radio>
-                    <Radio label="2">接口</Radio>
+                <Radio-Group v-model="casedate.type_id" v-if="case_pdt0 === ''" >
+                    <Radio label="1" disabled>性能</Radio>
+                    <Radio label="2" disabled>接口</Radio>
+                </Radio-Group>
+                <Radio-Group v-model="casedate.type_id" v-if="case_pdt0 != ''" >
+                    <Radio label="1" >性能</Radio>
+                    <Radio label="2" >接口</Radio>
                 </Radio-Group>
             </Form-item>
             <Form-item label="性能API列表"   v-if="casedate.type_id === '1'">
+<!--                <ul>
+                    <ol v-for="(item,index) in case_apidata">
+                        <Checkbox v-model="case_token[index]" ></Checkbox>
+                        &lt;!&ndash;                        <Poptip trigger="hover"  content="index">
+                                                    <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
+                                                </Poptip>&ndash;&gt;
+                        <Tooltip placement="top" max-width="200" theme="light">
+                            <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
+                            <div slot="content">
+                                {{case_apidata[index].api_name}}
 
+                            </div>
+                        </Tooltip>
+                        <i-input type="text" style="width:150px" v-model="case_input[index]" style="align:left" ></i-input>
+                    </ol>
+                </ul>-->
+                <i-Table  highlight-row :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                         @on-selection-change="handleSelectRow" :weight='800':height="fixedHeader ? 250 : ''"
+                          :size="tableSize" :data="case_apidata" :columns="tableColumns" ref="selection"></i-Table>
  <!--               <CheckboxGroup v-model="case_token" v-for="(item,index) in case_apidata">
                 <p><i-input type="text" style="width:50px" v-model="case_input" style="align:left" ></i-input>
                     <input type="checkbox" v-model="case_token" value="123">{{case_apidata[index].api_name}}
@@ -54,18 +76,14 @@
                     </label>
 
                 </dl>-->
-                <ul>
-                    <ol>
-                        <div slot="content">
-                        接口名称
-                    </div>
-                        <div>接口</div>
-                    </ol>
+<!--1111                <ul>
+
+
                     <ol v-for="(item,index) in case_apidata">
                         <Checkbox v-model="case_token[index]" ></Checkbox>
-                        <!--                        <Poptip trigger="hover"  content="index">
+                        &lt;!&ndash;                        <Poptip trigger="hover"  content="index">
                                                     <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
-                                                </Poptip>-->
+                                                </Poptip>&ndash;&gt;
                         <Tooltip placement="top" max-width="200" theme="light">
                             <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
                             <div slot="content">
@@ -75,7 +93,7 @@
                         </Tooltip>
                         <i-input type="text" style="width:150px" v-model="case_input[index]" style="align:left" ></i-input>
                     </ol>
-                </ul>
+                </ul>-->
                 <!--<ul>
                     <ol v-for="(item,index) in case_apidata" >
 &lt;!&ndash;                        <div>请选择你的爱好(vue)</div>
@@ -100,12 +118,15 @@
                 </ul>-->
             </Form-item>
             <Form-item label="接口API列表"   v-if="casedate.type_id === '2'">
-                <ul>
+                <i-Table  highlight-row :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                          @on-selection-change="handleSelectRow" :weight='800':height="fixedHeader ? 250 : ''"
+                          :size="tableSize" :data="case_apidata" :columns="tableColumns" ref="selection"></i-Table>
+              <!--  <ul>
                     <ol v-for="(item,index) in case_apidata">
                         <Checkbox v-model="case_token[index]" ></Checkbox>
-                        <!--                        <Poptip trigger="hover"  content="index">
+                        &lt;!&ndash;                        <Poptip trigger="hover"  content="index">
                                                     <i-input type="text" style="width:270px" v-model="case_apidata[index].api_name" disabled ></i-input>
-                                                </Poptip>-->
+                                                </Poptip>&ndash;&gt;
                         <Tooltip placement="top" max-width="200" theme="light">
                             <i-input type="text" style="width:200px" v-model="case_apidata[index].api_name" readonly ></i-input>
                             <div slot="content">
@@ -115,7 +136,7 @@
                         </Tooltip>
                         <i-input type="text" style="width:150px" v-model="case_input[index]" style="align:left" ></i-input>
                     </ol>
-                </ul>
+                </ul>-->
             </Form-item>
         </i-form>
 
@@ -125,31 +146,29 @@
 
     <Modal
             v-model="editFormVisible"
-            title="编辑产品"
+            title="编辑用例"
             @on-ok="update"
             @on-cancel="cancel"
     >
         <i-form ref="editForm" :model="editForm" :rules="ruleValidate" :label-width="80">
-            <Form-item label="产品名称" prop="pdt_name">
-                <i-input v-model="editForm.pdt_name" placeholder="请输入产品名称"></i-input>
+            <Form-item label="用例名称" prop="case_name">
+                <i-input v-model="editForm.case_name" placeholder="请输入产品名称"></i-input>
             </Form-item>
-            <Form-item label="产品版本" prop="version">
-                <i-input v-model="editForm.version" placeholder="请输入产品版本号 "></i-input>
+            <Form-item label="类型" prop="host">
+                <Radio-Group v-model="case_typeID" >
+                    <Radio :label="1">性能</Radio>
+                    <Radio :label="2">接口</Radio>
+                </Radio-Group>
             </Form-item>
-            <Form-item label="产品地址" prop="host">
-                <i-input v-model="editForm.host" placeholder="请输入产品地址"></i-input>
+            <Form-item label="性能API列表"   v-if="editForm.type_id ===1">
+                <i-Table   :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                          @on-selection-change="handleSelectRow" :weight='800':height="fixedHeader ? 250 : ''"
+                          :size="tableSize" :data="case_updatecase" :columns="tableColumns1" ref="selection"></i-Table>
             </Form-item>
-            <Form-item label="产品描述" prop="description">
-                <i-input v-model="editForm.description" placeholder="请输入产品描述"></i-input>
-            </Form-item>
-            <!--                <Form-item label="文件上传" >
-                                <i-input type="file" class="file"  @change="tirggerFile"/>
-            &lt;!&ndash;                    <Upload action="//jsonplaceholder.typicode.com/posts/" >
-                                    <i-Button icon="ios-cloud-upload-outline">Upload files</i-Button>
-                                </Upload>&ndash;&gt;
-                            </Form-item>-->
-            <Form-item label="api_json" prop="api_json">
-                <i-input v-model="editForm.api_json" placeholder="请输入接口字符串"></i-input>
+            <Form-item label="接口API列表"   v-if="editForm.type_id ===2">
+                <i-Table   :border="showBorder" :stripe="showStripe" :show-header="showHeader"
+                           @on-selection-change="handleSelectRow" :weight='800':height="fixedHeader ? 250 : ''"
+                           :size="tableSize" :data="case_updatecase" :columns="tableColumns1" ref="selection"></i-Table>
             </Form-item>
         </i-form>
 
@@ -162,9 +181,28 @@
         data: function () {
             return {
                 checkedNames:[],
+                selection:[],
+                case_typeID:'',
                 case_pdt0:'',
                 case_pdt:'',
-                case_apidata:'',
+                case_apidata:[],
+                case_updatecase:[
+                    /* {
+                         "api_id": 26,
+                         "api_name": "测试端口是否占用",
+                         "body": "",
+                         "has_token": true,
+                         "header": {
+                             "content-type": "application/json"
+                         },
+                         "method": "get",
+                         "pdt_id": 92,
+                         "proto_file": null,
+                         "proto_message": null,
+                         "url": "/Admin/Config/CheckPort",
+                         "values": "?port=108"
+                     }*/
+                ],
                 case_token:[],
                 case_input:[],
                 casedate:[{
@@ -188,13 +226,7 @@
                     ]
                 },
                 editForm: {
-                    pdt_id:'' ,
-                    pdt_name: '',
-                    version: '',
-                    host: '',
-                    description: '',
-                    api_json:'',
-
+                    "type_id": 1,
                 },
                 modal1: false,
                 formValidate: {
@@ -220,6 +252,7 @@
                 tableData3: [
 
                 ],
+                tableData:[],
                 showBorder: false, // 显示边框
                 showStripe: true, // 是否显示斑马纹
                 showHeader: true, // 是否显示头部信息
@@ -228,22 +261,6 @@
                 fixedHeader: false, // 显示滑动
                 tableSize: 'default'
             }
-        },
-        watch:{
-            //选择所属产品
-            case_pdt0(val,oldval){
-                axios.get('' + host + '/api/apiinfo/api?pid=' + val + '')
-                    .then(res => {
-                        console.log(res)
-                        this.case_apidata= res.data.message
-                        console.log(this.case_apidata)
-
-                    })
-                    .catch(function (error) {
-                        console.log(error)
-                    });
-                 console.log("push+function:"+val)
-            },
         },
         computed: {
             tableColumns3 () {
@@ -279,7 +296,8 @@
                     key: 'type_id',
                     align: 'center',
                     render: (h, params) => {
-                        return  h('span',params.row.type_id === 1 ?'性能' : params.row.type_id === 2? '接口' : '未知')
+                        //return  h('span',params.row.type_id === 1 ?'性能' : params.row.type_id === 2? '接口' : '未知')
+                        return  h('span',this.tableData3[params.index].type_id === 1 ?'性能' : this.tableData3[params.index].type_id === 2? '接口' : '未知')
                     }
                 });
                 columns.push({
@@ -322,8 +340,353 @@
                 })
                 console.log("columns"+JSON.stringify(columns))
                 return columns
+            },
+            tableColumns () {
+                let columns = []
+                if (this.showCheckbox) {
+                    columns.push({
+                        type: 'selection',
+                        width: 30,
+                        align: 'center',
+
+                    })
+                }
+                if (this.showIndex) {
+                    columns.push({
+                        type: 'index',
+                        width: 30,
+                        align: 'center',
+                    })
+                }
+                columns.push({
+                    title: 'ID',
+                    key: 'api_id',
+                    sortable: true,
+                    align: 'center',
+                })
+
+                columns.push({
+                    title: '用例名称',
+                    key: 'api_name',
+                    align: 'center',
+                    tooltip:true,
+                })
+                if(this.casedate.type_id==='1'){
+                    columns.push({
+                        title:'权重值',
+                        key:'weight',
+                        align: 'center',
+                        _isChecked:false,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('InputNumber', {
+                                    props: {
+                                        shape:"circle",
+                                        size: 'buttonSize',
+                                        min:1,
+                                        //value:params.row.weight,
+
+
+                                    },
+                                    style: {
+                                        marginRight: '5px',
+                                    },
+                                    on: {
+                                        'on-change': (event) => {
+
+                                            console.log('a：'+event)
+                                            console.log('b：'+JSON.stringify(params.row))
+                                            console.log('c：'+params.row.action)
+                                            console.log('d：'+params.index)
+                                            this.$refs.selection.objData[params.index]._isChecked=false;
+                                            this.$refs.selection.toggleSelect(params.index)
+                                            //this.$refs.selection.toggleRowSelection(params.row,true)
+                                            //this.case_input[params.index] = event
+                                            //var e={'weight':event};
+                                            this.case_apidata[params.index].weight=event;
+                                            console.log("fan："+JSON.stringify(this.case_apidata[params.index]));
+
+                                        }
+                                    }
+                                })
+                            ])
+                        }
+                    })
+                }else if(this.casedate.type_id==='2'){
+                    columns.push({
+                        title:'断言',
+                        key:'weight',
+                        align: 'center',
+                        _isChecked:false,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Input', {
+                                    props: {
+                                        shape:"circle",
+                                        size: 'buttonSize',
+                                        //value:params.row.weight,
+                                        type:'textarea',
+                                        autosize:{minRows:1,maxRows:3},
+
+
+
+                                    },
+                                    style: {
+                                        marginRight: '5px',
+                                    },
+                                    on: {
+                                        'on-change': (event) => {
+
+                                            console.log('a：'+JSON.stringify(event))
+                                            console.log('b：'+JSON.stringify(params.row))
+                                            console.log('c：'+params.row.action)
+                                            console.log('d：'+params.index)
+                                            this.$refs.selection.objData[params.index]._isChecked=false;
+                                            this.$refs.selection.toggleSelect(params.index)
+                                            //this.$refs.selection.toggleRowSelection(params.row,true)
+                                            //this.case_input[params.index] = event
+                                            //var e={'weight':event};
+                                            this.case_apidata[params.index].expection=JSON.parse(event.target.value);
+                                            console.log("fan："+JSON.stringify(this.case_apidata[params.index]));
+
+                                        }
+                                    }
+                                })
+                            ])
+                        }
+                    })
+                }
+
+                console.log("columns"+JSON.stringify(columns))
+                return columns
+            },
+            tableColumns1 () {
+                let columns = []
+                if (this.showCheckbox) {
+                    columns.push({
+                        type: 'selection',
+                        width: 30,
+                        align: 'center',
+
+                    })
+                }
+                if (this.showIndex) {
+                    columns.push({
+                        type: 'index',
+                        width: 30,
+                        align: 'center',
+                    })
+                }
+                columns.push({
+                    title: 'ID',
+                    key: 'api_id',
+                    sortable: true,
+                    align: 'center',
+                })
+
+                columns.push({
+                    title: '用例名称',
+                    key: 'api_name',
+                    align: 'center',
+                    tooltip:true,
+                })
+          console.log("update6"+'--22---'+JSON.stringify(this.case_updatecase));
+                if(this.case_typeID===1){
+                    //console.log("update6"+i+'--22---'+JSON.stringify(this.case_updatecase));
+                    columns.push({
+                        title:'权重值',
+                        key:'weigth',
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('InputNumber', {
+                                    props: {
+                                        shape:"circle",
+                                        size: 'buttonSize',
+                                        min:1,
+                                        _checked:true,
+                                        value:this.case_updatecase[params.index].weight,
+
+
+                                    },
+                                    style: {
+                                        marginRight: '5px',
+                                    },
+                                    on: {
+                                        'on-change': (event) => {
+                                            console.log('a：'+event)
+                                            console.log('b：'+JSON.stringify(params.row))
+                                            console.log('c：'+params.row.action)
+                                            console.log('d：'+params.index)
+                                            this.$refs.selection.objData[params.index]._isChecked=false;
+                                            this.$refs.selection.toggleSelect(params.index)
+                                            //this.$refs.selection.toggleRowSelection(params.row,true)
+                                            //this.case_input[params.index] = event
+                                            //var e={'weight':event};
+                                            this.case_updatecase[params.index].weight=event;
+                                            console.log("fan："+JSON.stringify(this.case_updatecase[params.index]));
+
+                                        }
+                                    }
+                                })
+                            ])
+                        }
+                    })
+                }else if(this.case_typeID===2){
+                    columns.push({
+                        title:'断言',
+                        key:'weight',
+                        align: 'center',
+                        _isChecked:false,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Input', {
+                                    props: {
+                                        shape:"circle",
+                                        size: 'buttonSize',
+                                        value:this.case_updatecase[params.index].expection,
+                                        type:'textarea',
+                                        autosize:{minRows:1,maxRows:3},
+
+
+
+                                    },
+                                    style: {
+                                        marginRight: '5px',
+                                    },
+                                    on: {
+                                        'on-change': (event) => {
+
+                                            console.log('a：'+JSON.stringify(event))
+                                            console.log('b：'+JSON.stringify(params.row))
+                                            console.log('c：'+params.row.action)
+                                            console.log('d：'+params.index)
+                                            this.$refs.selection.objData[params.index]._isChecked=false;
+                                            this.$refs.selection.toggleSelect(params.index)
+                                            //this.$refs.selection.toggleRowSelection(params.row,true)
+                                            //this.case_input[params.index] = event
+                                            //var e={'weight':event};
+                                            this.case_updatecase[params.index].expection=JSON.parse(event.target.value);
+                                            console.log("fan："+JSON.stringify(this.case_updatecase[params.index]));
+
+                                        }
+                                    }
+                                })
+                            ])
+                        }
+                    })
+                }
+
+                console.log("columns"+JSON.stringify(columns))
+                return columns
+            },
+        },
+        watch:{
+            //选择所属产品
+            case_pdt0(val,oldval){
+                console.log("push+function:"+oldval)
+                axios.get('' + host + '/api/apiinfo/api?pid=' + val + '')
+                    .then(res => {
+                        console.log(res)
+                        this.case_apidata= res.data.message;
+                        for(var i=0; i<this.case_apidata.length;i++){
+                            this.case_apidata[i].weight=1;
+                            this.case_apidata[i].expection='';
+                        }
+                        //console.log('hell0:'+JSON.stringify(this.case_apidata))
+
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    });
+                 console.log("push+function:"+val)
+            },
+            editForm(){
+               this.case_typeID=this.editForm.type_id;
+            },
+            case_typeID(val,oldval){
+                //this.case_typeID=this.editForm.type_id;
+                console.log("val111:"+JSON.stringify(this.editForm))
+                                var apdt='';
+                if(this.editForm.type_id===1){
+                    console.log('cs1:'+this.editForm.type_id)
+                    console.log('cs11'+this.editForm.api_weight[0].api_id);
+                    apdt=this.editForm.api_weight[0].api_id;
+
+                }
+                else if(this.editForm.type_id===2){
+                    console.log('cs2:'+this.editForm.type_id)
+                    //console.log('cs22'+this.editForm.api_expection[0].api_id);
+                    apdt=this.editForm.api_expection[0].api_id;
+                }
+                axios.get('' + host + '/api/apiinfo/api?aid=' + apdt + '')
+                    .then(res => {
+                        console.log(res)
+                        var cpdt= res.data.message.pdt_id;
+                        axios.get('' + host + '/api/apiinfo/api?pid=' + cpdt + '')
+                            .then(res => {
+                                console.log(res)
+                                this.case_updatecase= res.data.message;
+                                console.log('case_update'+this.case_updatecase)
+                                for(var i=0; i<this.case_updatecase.length;i++){
+                                    this.case_updatecase[i].weight=1;
+                                    this.case_updatecase[i].expection='';
+
+                                }
+                                for(var i=0;i<this.case_updatecase.length;i++){
+                                    if(val===1){
+                                        this.case_updatecase[i]._checked=false;
+                                        //console.log("参数s"+this.editForm.api_weight.length);
+                                        for(var j=0;j<this.editForm.api_weight.length;j++){
+                                           // console.log("update"+this.case_updatecase[i].api_id);
+                                            /*  console.log("update2"+this.editForm.api_weight[j].api_id);*/
+                                            if(this.case_updatecase[i].api_id===parseInt(this.editForm.api_weight[j].api_id)){
+                                                //console.log("update2"+this.editForm.api_weight[j].api_id);
+                                                this.case_updatecase[i]._checked=true;
+                                                //this.$refs.selection1.objData[i]._checked = true
+                                                /*this.$refs.selection1.toggleRowSelection(this.case_updatecase[i],true)*/
+                                                //this.$refs.selection.objData[i]._isChecked=false;
+                                                //this.$refs.table.$refs.tbody.objData[i]._isChecked = true
+                                                this.case_updatecase[i].weight=this.editForm.api_weight[j].weight;
+                                               // console.log("update4"+i+'-----'+this.case_updatecase[i].weight);
+
+
+                                            }
+                                            else{
+                                                this.case_updatecase[i]._isChecked=false;
+                                            }
+                                        }
+                                        console.log("勾选参数"+i+'-----'+JSON.stringify(this.case_updatecase[i]));
+                                    }
+                                    else if(val===2){
+                                        this.case_updatecase[i]._checked=false;
+                                        console.log("参数s"+JSON.stringify(this.editForm.api_expection));
+                                        for(var j=0;j<this.editForm.api_expection.length;j++){
+                                           if(this.case_updatecase[i].api_id===parseInt(this.editForm.api_expection[j].api_id)){
+                                               this.case_updatecase[i]._checked=true;
+                                               console.log("update文字"+i+'-----'+this.editForm.api_expection[j].expection);
+                                               this.case_updatecase[i].expection=JSON.stringify(this.editForm.api_expection[j].expection)
+                                           }
+                                        }
+                                    }
+
+                                }
+                            })
+                            .catch(function (error) {
+                                console.log(error)
+                            });
+
+                        /*                        if(res.data.message.desc===undefined){
+                                                }
+                                                else {alert(res.data.message.desc+'\n;说明'+'当前用例中有不存在API；建议删除重新创建')}*/
+
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    });
             }
         },
+
         mounted:function(){
             axios.get(''+host+'/api/caseinfo/caselist')
                 .then(res => {
@@ -347,7 +710,17 @@
 
         },
         methods:{
+             handleSelectRow:function(selection,row) {
 
+                //console.log('11:'+JSON.stringify(this.$refs.selection.getslection()));
+               /* console.log('1:'+this.tableData[0].action);*/
+                // console.log('11:'+selection.selectionIndexes);
+                console.log('21:'+JSON.stringify(row));
+                console.log('31:'+JSON.stringify(selection));
+                 //console.log('32:'+index);
+                this.selection=selection;
+                 //console.log("fan："+JSON.stringify(this.case_apidata[params.index]));
+            },
             //删除按钮
             remove: function (index) {
                 console.log('date1' + this.tableData3[index].case_id)
@@ -378,12 +751,16 @@
                 })
             },
             //点击编辑
-            show (index) {
+            show (row) {
+
                 this.editFormVisible=true;
-                console.log("shouw"+JSON.stringify(this.tableData3[index]))
-                this.editForm=this.tableData3[index];
+                console.log("shouw"+JSON.stringify(row))
+                this.editForm=row;
+                this.editForm.pdt_id='';
                 //this.editForm.api_json=JSON.parse(this.editForm.api_json)
                 console.log("shouw1"+JSON.stringify(this.editForm))
+                console.log("shouw2"+this.editForm.type_id)
+
                 /*                  this.$Modal.confirm({
                                       title: '编辑产品',
                                       fullscreen:true,
@@ -426,14 +803,55 @@
             ok :function (){
                 //let api_json = JSON.parse(this.case_api )
                 //this.formValidate.api_json=api_json
-                console.log("case_api:"+JSON.stringify(this.case_input));
-                console.log("case_api:"+JSON.stringify(this.case_token));
-                console.log("case_api2:"+this.casedate.type_id );
+/*                var state=[];
+                for(var j = 0; j < this.selection.length; j++){
+                    //console.log('case:'+this.case_apidata[i].api_name);
+                    if(this.selection.length!=0) {
+                        for (var i=0;i<this.case_apidata.length;i++) {
+                            //console.log('case2:'+selection[j].api_name);
+                            if(this.case_apidata[i].api_name===this.selection[j].api_name){
+
+                            }else{
+
+                            }
+
+                        }
+                        console.log('case:'+JSON.stringify(this.case_token));
+                    }
+                }*/
+                console.log("数据："+this.case_pdt0)
                 var weight_api0='';
                 var expection0='';
                 var weight_api=[];//性能1
                 var expection=[];//接口2
-                for(var i=0;i<this.case_token.length;i++){
+                for(var i=0;i<this.case_apidata.length;i++){
+                    for(var j=0;j<this.selection.length;j++){
+                        if(this.case_apidata[i].api_name===this.selection[j].api_name){
+                            if(this.casedate.type_id==='1'){
+                                weight_api0={
+                                    "api_id":this.case_apidata[i].api_id,
+                                    "weight":this.case_apidata[i].weight
+                                }
+                                weight_api.push(weight_api0);
+                            }else if(this.casedate.type_id==='2'){
+                                expection0={
+                                    "api_id":this.case_apidata[i].api_id,
+                                    "expection":this.case_apidata[i].expection
+                                }
+                                expection.push(expection0);
+                            }
+                            console.log("api_id7:"+JSON.stringify(weight_api0));;
+                            console.log("api_id6:"+JSON.stringify(weight_api))
+                        }
+                    }
+                }
+/*                console.log("888888888:"+JSON.stringify(this.case_apidata));
+                console.log("case_api11111:"+JSON.stringify(this.case_input));
+                console.log("case_api:"+JSON.stringify(this.case_token));
+                console.log("case_api2:"+this.casedate.type_id );
+                console.log("case_api3:"+this.showCheckbox );*/
+
+     /*           for(var i=0;i<this.case_token.length;i++){
                         console.log("api_id:"+this.case_apidata[i].api_id);
                         console.log("api_id2:"+this.case_input[i]);
                         if(this.case_token[i]===true){
@@ -476,7 +894,7 @@
                         }
 
 
-                    }
+                    }*/
                 console.log("api_id8:"+JSON.stringify(weight_api))
                 console.log("api_id9:"+JSON.stringify(expection))
 /*                if(this.casedate.type_id==='1'){
@@ -487,6 +905,7 @@
 
                 }*/
                      var obj={
+                         "associated_pdt_id":this.case_pdt0,
                          "case_name":this.casedate.case_name,
                          "api_weight":weight_api,
                          "type_id":this.casedate.type_id,
@@ -504,7 +923,7 @@
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                    //location.reload()
+                    location.reload()
 
                 })
                     .catch(function(error){
@@ -516,19 +935,58 @@
             //编辑
             update() {
                 console.log("修改:"+JSON.stringify(this.editForm));
-                this.editForm.api_json=JSON.parse(this.editForm.api_json)
+                console.log("修改7:"+JSON.stringify(this.selection));
+                //this.editForm.api_json=JSON.parse(this.editForm.api_json)
+                var weight_api0='';
+                var expection0='';
+                var weight_api=[];//性能1
+                var expection=[];//接口2
+                for(var i=0;i<this.case_updatecase.length;i++){
+                    console.log("修改2:"+JSON.stringify(this.case_updatecase));
+                    console.log("修改3:"+JSON.stringify(this.case_typeID));
+                    console.log("修改4:"+typeof(this.case_typeID));
+                    console.log("修改4:"+JSON.stringify(this.selection));
+                    for(var j=0;j<this.selection.length;j++){
+                        if(this.case_updatecase[i].api_name===this.selection[j].api_name){
+                            if(this.case_typeID===1){
+                                weight_api0={
+                                    "api_id":this.case_updatecase[i].api_id,
+                                    "weight":this.case_updatecase[i].weight
+                                }
+                                weight_api.push(weight_api0);
+                            }else if(this.case_typeID===2){
+                                expection0={
+                                    "api_id":this.case_updatecase[i].api_id,
+                                    "expection":this.case_updatecase[i].expection
+                                }
+                                expection.push(expection0);
+                            }
+                            console.log("api_id7:"+JSON.stringify(weight_api0));;
+                            console.log("api_id6:"+JSON.stringify(weight_api))
+                        }
+                    }
+                }
+                var obj={
+                    associated_pdt_id:this.editForm.associated_pdt_id,
+                    "case_id":this.editForm.case_id,
+                    "case_name":this.editForm.case_name,
+                    "api_weight":weight_api,
+                    "type_id":this.case_typeID,
+                    "api_expection":expection,
+                }
+                console.log("obj:"+JSON.stringify(obj));
                 axios({
-                    url: ''+host+'/api/product/updateproduct',
+                    url: ''+host+'/api/caseinfo/case',
                     method: 'put',
                     dataType: 'json',
                     headers: {
                         'Content-type': 'application/json;'
                     },
-                    data: JSON.stringify(this.editForm),
+                    data: JSON.stringify(obj),
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                    location.reload()
+                    //location.reload()
 
                 })
                     .catch(function(error){
@@ -538,14 +996,7 @@
             },
             cancel () {
                 this.$Message.info('已取消');
-                this.formValidate = {
-                    pdt_name: '123',
-                    version: '',
-                    host: '',
-                    description: '',
-                    api_json: ''
-                };
-                //location.reload()
+                setTimeout('location.reload()',500);
             },
 
         }

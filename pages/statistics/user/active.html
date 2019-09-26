@@ -4,172 +4,648 @@
 
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>用户活跃度</title>
+    <title>系统设置</title>
     <link rel="stylesheet" type="text/css" href="../../../assets/iview/iview-3.1.0/styles/iview.css" />
     <script src="../../../assets/vue/vue-2.5.17.min.js"></script>
+    <script src="../../../assets/axios/axios.js"></script>
+    <script src="../../../js/config.js"></script>
     <script src="../../../assets/iview/iview-3.1.0/iview.min.js"></script>
 </head>
 
 <body>
-    <div id="app">
-        <div style="margin: 10px">
-            显示边框 <i-switch v-model="showBorder" style="margin-right: 5px"></i-switch>
-            显示条纹 <i-switch v-model="showStripe" style="margin-right: 5px"></i-switch>
-            显示索引 <i-switch v-model="showIndex" style="margin-right: 5px"></i-switch>
-            显示多选框 <i-switch v-model="showCheckbox" style="margin-right: 5px"></i-switch>
-            显示表头 <i-switch v-model="showHeader" style="margin-right: 5px"></i-switch>
-            显示滚动条 <i-switch v-model="fixedHeader" style="margin-right: 5px"></i-switch>
-            <br>
-            <br>
-            表格大小
-            <Radio-group v-model="tableSize" type="button">
-                <Radio label="large">大</Radio>
-                <Radio label="default">中(默认)</Radio>
-                <Radio label="small">小</Radio>
-            </Radio-group>
-        </div>
-        <i-table :border="showBorder" :stripe="showStripe" :show-header="showHeader" :height="fixedHeader ? 300 : ''"
-            :size="tableSize" :data="tableData3" :columns="tableColumns3"></i-table>
-    </div>
-    <script type="text/javascript">
-        var vm = new Vue({
-            el: "#app",
-            data: function () {
-                return {
-                    tableData3: [
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            address: 'New York No. 1 Lake Park',
-                            date: '2016-10-03'
-                        },
-                        {
-                            name: 'Jim Green',
-                            age: 24,
-                            address: 'London No. 1 Lake Park',
-                            date: '2016-10-01'
-                        },
-                        {
-                            name: 'Joe Black',
-                            age: 30,
-                            address: 'Sydney No. 1 Lake Park',
-                            date: '2016-10-02'
-                        },
-                        {
-                            name: 'Jon Snow',
-                            age: 26,
-                            address: 'Ottawa No. 2 Lake Park',
-                            date: '2016-10-04'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            address: 'New York No. 1 Lake Park',
-                            date: '2016-10-03'
-                        },
-                        {
-                            name: 'Jim Green',
-                            age: 24,
-                            address: 'London No. 1 Lake Park',
-                            date: '2016-10-01'
-                        },
-                        {
-                            name: 'Joe Black',
-                            age: 30,
-                            address: 'Sydney No. 1 Lake Park',
-                            date: '2016-10-02'
-                        },
-                        {
-                            name: 'Jon Snow',
-                            age: 26,
-                            address: 'Ottawa No. 2 Lake Park',
-                            date: '2016-10-04'
+<div id="app">
+
+    <!-- <div style="margin: 10px">
+        显示边框 <i-switch v-model="showBorder" style="margin-right: 5px"></i-switch>
+        显示条纹 <i-switch v-model="showStripe" style="margin-right: 5px"></i-switch>
+        显示索引 <i-switch v-model="showIndex" style="margin-right: 5px"></i-switch>
+        显示多选框 <i-switch v-model="showCheckbox" style="margin-right: 5px"></i-switch>
+        显示表头 <i-switch v-model="showHeader" style="margin-right: 5px"></i-switch>
+        显示滚动条 <i-switch v-model="fixedHeader" style="margin-right: 5px"></i-switch>
+        <br>
+        <br>
+        表格大小
+        <Radio-group v-model="tableSize" type="button">
+            <Radio label="large">大</Radio>
+            <Radio label="default">中(默认)</Radio>
+            <Radio label="small">小</Radio>
+        </Radio-group>
+    </div> -->
+
+    <br>
+
+    <!--   <i-Button type="primary" @click="modal1 = true"  >新增任务</i-Button> -->
+    <i-Button type="primary" @click="add"  >新增任务</i-Button>
+    <!-- 新增表单 -->
+    <modal
+            v-model="modal1"
+            title="新增任务"
+            @on-ok="ok"
+            ref="modal"
+            @on-cancel="cancel"
+            width=600
+    >
+
+
+        <i-Form :model="addform" :label-width="110" >
+            <Form-Item label="任务类型" >
+                <i-Select v-model="addform.task_type" size="large" style="width:400px">
+                    <i-Option :value="1">技术支持</i-Option>
+                    <i-Option :value="2">测试任务</i-Option>
+                    <i-Option :value="3">文档编写</i-Option>
+                    <!-- <i-Option v-for="(item,index) in addform ":key="index" :value="item.task_id">{{ item.task_id }}</i-Option> -->
+                </i-Select>
+            </Form-Item>
+
+            <Form-Item label="相关项目" >
+                <i-Select v-model="addform.pdt_id" size="large" style="width:400px">
+                    <i-Option :value="1">imcis</i-Option>
+                    <i-Option :value="2">pod</i-Option>
+                    <i-Option :value="3">viewr</i-Option>
+                    <i-Option :value="4">token</i-Option>
+                </i-Select>
+            </Form-Item>
+
+            <Form-Item label="任务内容">
+                <i-Input v-model="addform.content" placeholder="Enter something..."  type="textarea" :rows="5"
+                         style="width:400px"></i-Input>
+            </Form-Item>
+
+            <Form-Item label="备注说明">
+                <i-Input v-model="addform.remark" placeholder="Enter something..."  type="textarea"
+                         style="width:400px"></i-Input>
+            </Form-Item>
+
+            <Form-Item label="完成时间">
+                <Date-Picker type="date"   placeholder="Select date" v-model="addform.planfinished_time"  format="yyyy-MM-dd"  @on-change="addform.planfinished_time=$event"></Date-Picker>
+            </Form-Item>
+
+            <Form-Item label="任务进度">
+                <Input-Number  v-model="addform.finished_percent"
+                               :max="100"
+                               v-model="value10"
+                               :formatter="value => `${value}%`"
+                               :parser="value => value.replace('%', '')"></Input-Number>
+                </ButtonGroup>
+            </Form-Item>
+
+        </i-form>
+        <!-- <div solt="footer" >
+      <i-button @on-check="ok" value="ok">next</i-button>
+
+
+        </div> -->
+    </modal>
+
+    <!-- 修改表单	  -->
+    <modal
+            v-model="modal2"
+            title="修改任务"
+            @on-ok="update"
+            @on-cancel="cancel">
+
+        <i-Form :model="updateform" :label-width="100" >
+            <Form-Item label="任务类型" >
+                <i-Select v-model="updateform.task_type" size="large" style="width:350px">
+                    <i-Option :value="1">技术支持</i-Option>
+                    <i-Option :value="2">测试任务</i-Option>
+                    <i-Option :value="3">文档编写</i-Option>
+                    <!-- <i-Option v-for="(item,index) in addform ":key="index" :value="item.task_id">{{ item.task_id }}</i-Option> -->
+                </i-Select>
+            </Form-Item>
+
+            <Form-Item label="相关项目" >
+                <i-Select v-model="updateform.pdt_id" size="large" style="width:350px">
+                    <i-Option :value="1">imcis</i-Option>
+                    <i-Option :value="2">pod</i-Option>
+                    <i-Option :value="3">viewr</i-Option>
+                    <i-Option value="4">token</i-Option>
+                </i-Select>
+            </Form-Item>
+
+            <Form-Item label="任务内容">
+                <i-Input v-model="updateform.content" placeholder="Enter something..."  type="textarea" :rows="5"
+                         style="width:350px"></i-Input>
+            </Form-Item>
+
+            <Form-Item label="备注说明">
+                <i-Input v-model="updateform.remark" placeholder="Enter something..."  type="textarea"
+                         style="width:350px"></i-Input>
+            </Form-Item>
+
+            <Form-Item label="完成时间">
+                <Date-Picker type="date"  placeholder="Select date" :value="updateform.planfinished_time"  @on-change="updateform.planfinished_time=$event" ></Date-Picker>
+            </Form-Item>
+
+            <Form-Item label="任务进度">
+                <Input-Number  v-model="updateform.finished_percent"
+                               :max="100"
+                               :min="0"
+                               :formatter="value => `${value}%`"
+                               :parser="value => value.replace('%', '')"></Input-Number>
+                </ButtonGroup>
+            </Form-Item>
+
+        </i-form>
+    </modal>
+
+    <!-- <i-Button type="primary" @click="modal1 = true">Display dialog box</i-Button>
+       <Modal
+           v-model="modal1"
+           title="Common Modal dialog box title"
+           @on-ok="ok"
+           @on-cancel="cancel">
+           <p>Content of dialog</p>
+           <p>Content of dialog</p>
+           <p>Content of dialog</p>
+       </Modal> -->
+    <i-table :border="showBorder" :stripe="showStripe" :show-header="showHeader" :height="fixedHeader ? 300 : ''"
+             :size="tableSize" :data="tableData3" :columns="tableColumns3" style="margin: 20px">
+
+
+    </i-table>
+    <br>
+
+    <template>
+        <Page :total="searchPages.total" :current="searchPages.current" :page-size="searchPages.size" show-total  show-elevator @on-change="initChangePage" align="right"/>
+        <!-- <search-form  :tableData3="tableData3" @searchInfo="search"  @changeStatus="changeStatus" @changeCurrent="changeCurrent"></search-form> -->
+        <!-- <Page :total="100" show-total align="right"/> -->
+
+    </template>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                modal1:false,
+                modal2:false,
+
+                deviation:'',
+                delete_flag:'',
+                create_time: '',
+                addform:{
+                    task_type:1,
+                    pdt_id:1,
+                    planfinished_time:'',
+                    finished_percent:'0',
+                    remark:'',
+                    content:'',
+                    userid:''
+                },
+
+                updateform:{
+                    task_type:'',
+                    pdt_id:'',
+                    planfinished_time:'',
+                    finished_percent:'0',
+                    remark:'',
+                    content:'',
+
+                },
+                searchPages:{
+                    size:20,
+                    total:'40',
+                    current:1
+                },
+                listdata:[],
+                tableData3: [
+                    // {    task_id:'1',
+                    //      content:'1',
+                    //      pdt_id:'1',
+                    //      finished_percent:'1',
+                    //      planfinished_time:'1',
+                    //      finishedtime:'1',
+                    //      deviation:'1',
+                    //      remark:'1'
+                    // }
+
+                ],
+                showBorder: true,
+                showStripe: true,
+                showHeader: true,
+                showIndex: true,
+                showCheckbox: false,
+                fixedHeader: false,
+                tableSize: 'default'
+
+            }
+        },
+        // watch:{
+        // 	updateform:function(){
+        // 		console.log("sssd:"+this.updateform.task_id)
+        // 	}
+        // },
+        watch:{
+            modal1:function(val,oldval){
+                console.log("222:"+val)
+            }
+        },
+        computed: {
+            tableColumns3() {
+                let columns = [];
+                if (this.showCheckbox) {
+                    columns.push({
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    })
+                }
+                if (this.showIndex) {
+                    columns.push({
+                        type: 'index',
+                        width: 60,
+                        align: 'center'
+                    })
+                }
+                columns.push({
+                    title: 'ID',
+                    key: 'task_id',
+                    width: 100,
+                    align: 'center'
+                });
+                columns.push({
+                    title: '任务类型',
+                    key: 'task_type',
+                    sortable: true,
+                    //width: 150,
+                    align: 'center',
+                    render: (h, params) => {
+                        return  h('span',params.row.task_type === 1 ?'技术支持' : params.row.task_type === 2? '测试任务' : '文档编写')
+                    }
+                });
+                columns.push({
+                    title: '相关产品/项目',
+                    key: 'pdt_id',
+                    //width: 150,
+                    align: 'center',
+                    render: (h, params) => {
+                        return  h('span',this.tableData3[params.index].pdt_id === 1 ?'imcis' : this.tableData3[params.index].pdt_id === 2? 'pod' : this.tableData3[params.index].pdt_id === 3? 'viewer' :'token')}
+
+                });
+                columns.push({
+                    title: '任务内容',
+                    key: 'content',
+                    width: 600,
+                    align: 'center',
+
+                    //  render: (h, params) => {
+                    // 	return  h('span',this.tableData3[params.index].content)}
+                    //
+
+                });
+                columns.push({
+                    title: '进度',
+                    key: 'finished_percent',
+                    sortable: true,
+                    //width: 60,
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('span',params.row.finished_percent +'%')},
+
+                });
+                columns.push({
+                    title: '计划完成时间',
+                    key: 'planfinished_time',
+                    sortable: true,
+                    //width: 200,
+                    align: 'center',
+
+                });
+                columns.push({
+
+                    title: '实际完成时间',
+                    key: 'finished_time',
+                    sortable: true,
+                    // width: 200,
+                    align: 'center'
+
+                });
+                columns.push({
+                    title: '延期天数',
+                    key: 'deviation',
+                    sortable: true,
+                    //width: 200,
+                    align: 'center',
+
+                });
+                columns.push({
+                    title: '备注',
+                    key: 'remark',
+                    //width: 200,
+                    align: 'center'
+                });
+
+                columns.push({
+                    title: 'action',
+                    key: 'action',
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    size: 'small'
+                                },
+                                style: {
+                                    marginRight: '5px'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.show(params.row)
+                                    }
+                                }
+                            }, '修改'),
+                            h('Button', {
+                                props: {
+                                    type: 'error',
+                                    size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.remove(params.index)
+                                    }
+                                }
+                            }, '删除')
+                        ])
+                    }
+                });
+
+
+                return columns;
+            }
+        },
+        //获取task列表
+        created:function(){
+
+            axios.get(''+host+'/api/v1/task')
+                .then(res => {
+                    console.log(res)
+                    //console.log("12s3"+JSON.stringify(res.data))
+                    //this.tableData3 =res.data.data
+                    console.log(res.data.data.length)
+                    //console.log(this.formdata)
+                    var totalNum = 0;
+                    for(var i=0 ; i<res.data.data.length ;i++){
+                        var obj =eval(res.data.data[i]);
+                        //console.log(obj)
+                        obj.index=i+1;
+                        totalNum ++;
+                        //console.log(i)
+                        //console.log(res.data.data[i].deviation)
+                        if(res.data.data[i].deviation===null){
+                            res.data.data[i].deviation="未完成"
+                        }else{
+                            res.data.data[i].deviation=res.data.data[i].deviation+"天"
                         }
-                    ],
-                    showBorder: true,
-                    showStripe: true,
-                    showHeader: true,
-                    showIndex: true,
-                    showCheckbox: false,
-                    fixedHeader: false,
-                    tableSize: 'default'
+                        //console.log("this.formdata[i]="+i+JSON.stringify(this.formdata[i]))
+                        this.listdata.push(obj);
+                        if(i<20){
+
+                            this.tableData3.push(obj);
+
+                        }
+                    }
+                    this.searchPages.total=totalNum;
+
+                    // for(var i=0;i<this.tableData3.length;i++){
+                    // 	if(this.tableData3[i].task_type===1){
+                    // 		this.tableData3[i].task_type='测试'
+                    // 	}
+                    // }
+                    //this.filters=this.tableData3.pdt_name
+                    //console.log("tabledata3:"+JSON.stringify(this.tableData3))
+                })
+                .catch(function (error) {
+                    console.log(error)
+                });
+        },
+        methods:{
+            //获取task列表
+
+            next(){this.modal1=true;},
+
+            ok :function () {
+/*                this.modal1=true;
+                console.log("0111"+this.modal1)
+                this.modal1=true;
+                console.log("011221"+this.modal1)*/
+                //新增任务
+                //console.log("点击确定"+JSON.stringify(this.addform));
+                var user_id= window.sessionStorage.getItem("user_id");
+                let obj = {
+                    "task_type":parseInt(this.addform.task_type),
+                    "pdt_id":parseInt(this.addform.pdt_id),
+                    "content":this.addform.content,
+                    "planfinished_time":this.addform.planfinished_time,
+                    "finished_percent":this.addform.finished_percent,
+                    //"userid":1,
+                    "remark":this.addform.remark,
+                    "user_id":1
+                }
+                console.log("obj"+JSON.stringify(obj))
+                axios({
+                    url: ''+host+'/api/v1/task',
+                    method: 'post',
+                    dataType: 'json',
+                    headers: {
+                        'Content-type': 'application/json;'
+                    },
+                    data: JSON.stringify(obj),
+                }).then(function (response){
+                    console.log(response)
+
+                    // alert("操作:"+response.data.data)
+                    //    this.$Modal.confirm({
+                    //     render: (h) => {
+                    //       return h('Input', {
+                    //         props: {
+                    //           value: this.value,
+                    //           autofocus: true,
+                    //           placeholder: 'Please enter your name...'
+                    //         },
+                    //         on: {
+                    //           input: (val) => {
+                    //             this.value = val;
+                    //           }
+                    //         }
+                    //       })
+                    //     }
+                    //   })
+                    console.log("45"+this.modal1)
+
+    /*                if (confirm("新增成功，是否新增下一条任务？")) {
+                        console.log("11"+this.modal1)
+                        window.event.returnValue = true;
+                    }
+                    else {
+                        window.event.returnValue = false;
+                    }*/
+                   alert("新增成功，是否新增下一条任务？")
+                    if(window.event.returnValue = true)
+                    {
+                        var cs='test'
+                        return
+
+                        /*alert("添加成功")*/
+
+
+                    }/*else if ((window.event.returnValue = false)){
+                        var cs='201'
+                    }*/
+                })
+                    .catch(function(error){
+                        alert("请求超时")
+                        console.log(error)
+                    })
+                if(cs='test')
+                {      this.addform={
+                    task_type:1,
+                    pdt_id:1,
+                    planfinished_time:'',
+                    finished_percent:'0',
+                    remark:'',
+                    content:'',
+                    userid:''
+                };
+                    this.$refs.modal.visible = true;
+                    //this.modalLoading = false;
+                    this.add();
+                    return
+                }
+                if(cs='201'){
+                    this.$refs.modal.visible = false;
+                    location.reload()
+                }
+
+
+
+                // axios({
+                // 	url:
+                // 	method:
+                // 	method: 'post',
+                //                dataType: 'json',
+                //                headers: {'Content-type': 'application/json;' },
+                // data: json.stringify(obj),
+                // }).then(function(response){
+                // 	console.log(response)
+                //
+                //
+                // }
+                // )
+                this.$Message.info('已提交');
+
+
+
+            },
+            add :function(){
+                this.modal1=true;
+                console.log("1"+this.modal1)
+                // this.modal1=false;
+            },
+            //弹窗点击确定
+            cancel () {
+                this.$Message.info('已取消');
+/*                 					 this.modal1=true;
+                                    console.log("2:"+this.modal1)*/
+                location.reload()
+
+            },
+
+            //点击修改按钮
+            show (row) {
+                this.modal2=true;
+
+
+                console.log("show:"+JSON.stringify(row))
+                this.updateform=row;
+                console.log(this.updateform)
+                console.log("show1:"+JSON.stringify(this.updateform))
+
+            },
+            updateform(){
+
+            },
+            //修改更新
+            update() {
+                console.log("修改:"+JSON.stringify(this.updateform));
+
+                axios({
+                    url: ''+host+'/api/v1/task',
+                    method: 'put',
+                    dataType: 'json',
+                    headers: {
+                        'Content-type': 'application/json;'
+                    },
+                    data: JSON.stringify(this.updateform),
+                }).then(function (response){
+                    console.log(response)
+                    alert("返回:"+response.data.data)
+                    location.reload()
+
+                })
+                    .catch(function(error){
+                        console.log(error)
+                    })
+
+            },
+
+
+            remove : function (index)  {
+                console.log('date1' + this.tableData3[index].task_id)
+                var obj1={
+                    "task_id": this.tableData3[index].task_id,
+                    "delete_flag":1}
+                console.log('ta'+JSON.stringify(obj1))
+
+                this.tableData3.splice(index, 1);
+                axios({
+                    url: ''+host+'/api/v1/task',
+                    method: 'delete',
+                    dataType: 'json',
+                    headers: {
+                        'Content-type': 'application/json;'
+                    },
+                    data: JSON.stringify(obj1),
+                }).then(res => {
+                    if (res.status === 200) {
+                        alert('success')
+                        // 更新数据
+                        console.log(res)
+                        this.tableData3.splice(index, 1)
+                    } else {
+                        alert(res.message)
+                    }
+                }).catch(function () {
+                    alert('服务连接出错了')
+                })
+            },
+
+            //分页
+
+            initChangePage:function(val){
+                // i<=(x>10?10:x)
+
+                //this.searchPages.current = val
+                console.log("当前页码"+val)
+                this.tableData3.splice(0,this.tableData3.length);
+                //console.log("当前显示的数据"+this.tableData3)
+
+                for(var i = 20*(val - 1) + 1;
+                    i<= ((this.searchPages.total>20*val)?(20*val):(this.searchPages.total));
+                    i++){
+                    //console.log(" i = " + i + "，item：" + JSON.stringify(this.listdata[i]));
+                    this.tableData3.push(this.listdata[i-1]);
+                    //this.formdate=this.listdata[i-1];
+
                 }
             },
-            computed: {
-                tableColumns3() {
-                    let columns = [];
-                    if (this.showCheckbox) {
-                        columns.push({
-                            type: 'selection',
-                            width: 60,
-                            align: 'center'
-                        })
-                    }
-                    if (this.showIndex) {
-                        columns.push({
-                            type: 'index',
-                            width: 60,
-                            align: 'center'
-                        })
-                    }
-                    columns.push({
-                        title: 'Date',
-                        key: 'date',
-                        sortable: true
-                    });
-                    columns.push({
-                        title: 'Name',
-                        key: 'name'
-                    });
-                    columns.push({
-                        title: 'Age',
-                        key: 'age',
-                        sortable: true,
-                        filters: [
-                            {
-                                label: 'Greater than 25',
-                                value: 1
-                            },
-                            {
-                                label: 'Less than 25',
-                                value: 2
-                            }
-                        ],
-                        filterMultiple: false,
-                        filterMethod(value, row) {
-                            if (value === 1) {
-                                return row.age > 25;
-                            } else if (value === 2) {
-                                return row.age < 25;
-                            }
-                        }
-                    });
-                    columns.push({
-                        title: 'Address',
-                        key: 'address',
-                        filters: [
-                            {
-                                label: 'New York',
-                                value: 'New York'
-                            },
-                            {
-                                label: 'London',
-                                value: 'London'
-                            },
-                            {
-                                label: 'Sydney',
-                                value: 'Sydney'
-                            }
-                        ],
-                        filterMethod(value, row) {
-                            return row.address.indexOf(value) > -1;
-                        }
-                    });
-                    return columns;
-                }
-            }
-        });
-    </script>
+
+
+        }
+
+    });
+</script>
 </body>
 
 </html>

@@ -24,13 +24,13 @@
                     </div>
                     <i-menu id="sider_menu" ref="myMenu" :active-name="currentTab.name" theme="dark" width="auto"
                         :open-names="menuState.openNames" accordion :class="menuitemClasses" :style="{height:menuState.height+'px'}">
-                        <template v-for="submenu in menu" :key="submenu.name">
+                        <template v-for="(submenu,index) in menu" :key="submenu.name">
                             <submenu :name="submenu.name">
                                 <template slot="title">
                                     <Icon :type="submenu.icon"></Icon>
-                                    <span :title="submenu.title">{{submenu.title}}</span>
+                                    <span :title="submenu.title" >{{submenu.title}}</span>
                                 </template>
-                                <template v-for="item in submenu.menuItem">
+                                <template v-for="(item,index) in submenu.menuItem">
                                     <menu-item :name="item.name" @click.native="handleMenuClick(item)" :style="{paddingLeft:(!isCollapsed?43:25)+'px'}">
                                         <Icon :type="item.icon"></Icon>
                                         <span :title="item.label">{{item.label}}</span>
@@ -49,17 +49,13 @@
                             </div>
                             <div class="layout-nav" :style="{width: (isCollapsed ? 390 : 500) + 'px'}">
                                 <menu-item name="1" title="内容管理">
-                                    JSON格式化
+                                    <p align="right"><a href=" http://www.JSON.cn" target="_blank">JSON格式化</a></p>
                                 </menu-item>
                                 <menu-item name="2">
                                     接口列表
                                 </menu-item>
-                                <menu-item name="4">
-                                    用例管理
-                                </menu-item>
-                              <menu-item name="5">
 
-                              </menu-item>
+
                                 <Submenu name="3">
                                     <template slot="title">
                                         我的
@@ -167,8 +163,9 @@
                     ]
                   },
                   {
-                    title: "其他", name: "6", icon: "logo-tux", menuItem: [
-                      { label: "数据生成", name: "6-1", href: "pages/account/other/list.html", icon: "logo-apple", closable: true }
+                    title: "辅助工具", name: "6", icon: "logo-tux", menuItem: [
+                      { label: "产品数据生成", name: "6-1", href: "pages/account/other/list.html", icon: "logo-apple", closable: true },
+                          { label: "JSON格式化", name: "6-2", href: " http://www.JSON.cn", icon: "logo-apple", closable: true },
                     ]
                   }
                 ],

@@ -404,8 +404,8 @@
                 let  obj={
                         "pdt_id":this.formValidate[this.api_pdt].pdt_id,
                         "method":this.api_api.method,
-                        "header":this.api_api.produces,
-                        "body":this.api_api.parameters,
+                        "header":JSON.parse(this.api_api.produces),
+                        "body":JSON.parse(this.api_api.parameters),
                         "api_name":this.api_api.summary,
                         "values":"",
                           "url":this.api_api.uri,
@@ -426,7 +426,8 @@
                 }).then(function (response){
                     console.log(response)
                     alert("操作:"+response.data.title+",\n结果:"+response.data.message)
-                    //location.reload()
+
+                    location.reload()
 
                 })
                     .catch(function(error){
@@ -459,7 +460,8 @@
 
             },
             cancel () {
-                this.$Message.info('已取消');
+               //this.$Message.info('已取消');
+                setTimeout('location.reload()',500);
             },
 
         }
