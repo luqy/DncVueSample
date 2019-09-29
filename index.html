@@ -75,8 +75,8 @@
                     </i-header>
                     <i-content :style="mainContentHeight">
                         <tabs :type="tab.type" closable v-show="tabs.length>0" :value="currentTab.name" :animated="true"
-                            @on-click="handleTabClicked" @on-tab-remove="handleTabRemoved">
-                            <Dropdown style="margin-left: 20px" placement="bottom-end" transfer="true" slot="extra"
+                            @on-change='hadkeTabChange' @on-click="handleTabClicked" @on-tab-remove="handleTabRemoved">
+<!--                            <Dropdown style="margin-left: 20px" placement="bottom-end" transfer="true" slot="extra"
                                 @on-click="handleTabDropdownClick">
                                 <i-button type="text" style="height:30px;">
                                     <Icon type="ios-arrow-down"></Icon>
@@ -95,11 +95,11 @@
                                         <Icon type="md-swap"></Icon> 切换模式
                                     </dropdown-item>
                                 </dropdown-menu>
-                            </Dropdown>
+                            </Dropdown>-->
                             <tab-pane v-for="(tab,index) in tabs" :key="tab" :label="tab.label" :icon="tab.icon" :name="tab.name"
                                 :closable="tab.closable">
-                                <iframe :src="tab.href" style="border:none;width:100%;" frameborder="0" :height="frameHeight"
-                                    marginheight="0" scrolling="auto" marginwidth="0"></iframe>
+                         <!--       <iframe :src="tab.href" style="border:none;width:100%;" frameborder="0" :height="frameHeight"
+                                    marginheight="0" scrolling="auto" marginwidth="0"></iframe>-->
                             </tab-pane>
                         </tabs>
                     </i-content>
@@ -203,6 +203,9 @@
 
             },
             methods: {
+                hadkeTabChange:function(){
+                    new  data()
+                },
                 init: function () {
                     this.calcFrameHeight();
                     this.calcSiderMenuHeight();
